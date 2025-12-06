@@ -728,15 +728,15 @@ def before_request_handler():
         # Just return immediately and let the request through
         return None
     
-    # Check hardware fingerprint ban (if stored in session)
-    if 'hardware_fingerprint' in session:
-        hw_fingerprint_id = session['hardware_fingerprint']
-        hw_record = HardwareFingerprint.query.filter_by(fingerprint_id=hw_fingerprint_id).first()
-        
-        if hw_record and hw_record.is_banned:
-            # Hardware is banned - redirect to ban page
-            if request.path != '/hardware-banned':
-                return redirect(url_for('hardware_banned_page', reason=hw_record.ban_reason or 'Violation of Terms of Service'))
+    # Check hardware fingerprint ban (disabled for localhost)
+    # if 'hardware_fingerprint' in session:
+    #     hw_fingerprint_id = session['hardware_fingerprint']
+    #     hw_record = HardwareFingerprint.query.filter_by(fingerprint_id=hw_fingerprint_id).first()
+    #     
+    #     if hw_record and hw_record.is_banned:
+    #         # Hardware is banned - redirect to ban page
+    #         if request.path != '/hardware-banned':
+    #             return redirect(url_for('hardware_banned_page', reason=hw_record.ban_reason or 'Violation of Terms of Service'))
     
     # Paths that don't require verification (but still check hardware ban)
     verification_exempt_paths = (
@@ -744,32 +744,32 @@ def before_request_handler():
         '/hardware-banned', '/login', '/logout'
     )
     
-    # Check if user needs verification (only for first visit)
-    if not any(request.path.startswith(path) for path in verification_exempt_paths):
-        if 'verified' not in session and not current_user.is_authenticated:
-            # Store the original URL they wanted to visit
-            session['verification_redirect'] = request.url
-            return redirect(url_for('verify_page'))
+    # Check if user needs verification (disabled for localhost)
+    # if not any(request.path.startswith(path) for path in verification_exempt_paths):
+    #     if 'verified' not in session and not current_user.is_authenticated:
+    #         # Store the original URL they wanted to visit
+    #         session['verification_redirect'] = request.url
+    #         return redirect(url_for('verify_page'))
     
-    # AI Traffic Guardian DDoS check (runs first and must be very fast)
+    # AI Traffic Guardian DDoS check (disabled for localhost)
     # Define paths that are critical for scanner functionality and should not be blocked.
-    guardian_exempt_paths = ('/api/submit/', '/api/download-scanner/')
+    # guardian_exempt_paths = ('/api/submit/', '/api/download-scanner/')
+    # 
+    # if AI_GUARDIAN_ENABLED and not request.path.startswith(guardian_exempt_paths):
+    #     guardian_response = ai_guardian_check()
+    #     if guardian_response is not None:
+    #         return guardian_response
     
-    if AI_GUARDIAN_ENABLED and not request.path.startswith(guardian_exempt_paths):
-        guardian_response = ai_guardian_check()
-        if guardian_response is not None:
-            return guardian_response
-    
-    # Enforce canonical URL (https://www.asyncac.cc)
-    canonical_host = "www.asyncac.cc"
+    # Enforce canonical URL (disabled for localhost)
+    # canonical_host = "www.asyncac.cc"
     # Skip enforcement for localhost, static assets, and API calls to avoid issues
-    if (not app.debug and 
-        request.host != canonical_host and
-        not request.path.startswith('/api/') and
-        not any(request.path.endswith(ext) for ext in ['.js', '.css', '.svg', '.png', '.jpg', '.ico'])):
-        
-        new_url = f"https://{canonical_host}{request.full_path}"
-        return redirect(new_url, code=301)
+    # if (not app.debug and 
+    #     request.host != canonical_host and
+    #     not request.path.startswith('/api/') and
+    #     not any(request.path.endswith(ext) for ext in ['.js', '.css', '.svg', '.png', '.jpg', '.ico'])):
+    #     
+    #     new_url = f"https://{canonical_host}{request.full_path}"
+    #     return redirect(new_url, code=301)
 
     # Track user activity (skip for API endpoints that don't use sessions)
     if not request.path.startswith('/api/submit/'):
