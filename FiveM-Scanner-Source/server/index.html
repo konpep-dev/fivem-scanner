@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -6,32 +6,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>
     </async> Scanner | Security & Anti-Cheat for FiveM, DayZ & Minecraft</title>
-  <meta name="description"
-    content="Protect your FiveM, DayZ, and Minecraft servers with </async>, the next-gen real-time security scanner. Detect threats, analyze systems, and ensure fair play with our powerful anti-cheat solution.">
+  <meta name="description" content="Protect your FiveM, DayZ, and Minecraft servers with </async>, the next-gen real-time security scanner. Detect threats, analyze systems, and ensure fair play with our powerful anti-cheat solution.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700&family=JetBrains+Mono:wght@400&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;700&display=swap"
     rel="stylesheet">
   <script src="security.js"></script>
   <script src="notifications.js"></script>
   <style>
     :root {
-      --bg-dark: #050505;
-      --bg-panel: #0a0a0a;
-      --surface-glass: rgba(20, 20, 20, 0.6);
-      --surface-glass-hover: rgba(30, 30, 30, 0.7);
-      --border-glass: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a1a1aa;
-      --primary-glow: rgba(88, 101, 242, 0.5);
-      --accent-color: #5865F2;
-      --accent-hover: #4752C4;
-      --success: #10B981;
-      --danger: #EF4444;
-      --warning: #F59E0B;
-      --font-main: 'Inter', sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
+      --background-color: #0A0A0A;
+      --sidebar-bg: #000000;
+      --surface-color: #141414;
+      --border-color: #2A2A2A;
+      --text-primary: #FFFFFF;
+      --text-secondary: #A0A0A0;
+      --accent-positive: #10B981;
+      --accent-negative: #EF4444;
+      --accent-warning: #F59E0B;
+      --discord-blurple: #5865F2;
+      --discord-online: #23a55a;
+      --discord-idle: #f0b232;
+      --discord-dnd: #f23f43;
+      --discord-offline: #80848e;
+      --terminal-glow: #10B981;
     }
 
     * {
@@ -47,15 +46,14 @@
     }
 
     body {
-      background-color: var(--bg-dark);
+      background-color: transparent;
       color: var(--text-primary);
-      font-family: var(--font-main);
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
-      background-image:
-        radial-gradient(circle at 15% 50%, rgba(88, 101, 242, 0.08), transparent 25%),
-        radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.05), transparent 25%);
     }
-
+    
     body.sidebar-open {
       overflow: hidden;
     }
@@ -63,15 +61,15 @@
     .hidden {
       display: none !important;
     }
-
+    
     #true-background {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: var(--bg-dark);
-      z-index: -3;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #000;
+        z-index: -3;
     }
 
     /* Landing Page Specific */
@@ -93,7 +91,7 @@
       height: 200vh;
       max-width: 2500px;
       max-height: 2500px;
-      background-image: radial-gradient(circle, rgba(88, 101, 242, 0.15), transparent 50%);
+      background-image: radial-gradient(circle, rgba(88, 101, 242, 0.45), transparent 50%);
       transform: translate(-50%, -50%);
       animation: pulse 8s infinite ease-in-out;
       z-index: -2;
@@ -129,11 +127,10 @@
     .floating-symbol {
       position: absolute;
       color: white;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-      opacity: 0.05;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.7), 0 0 20px rgba(255, 255, 0.5);
+      opacity: 0.1;
       user-select: none;
       animation: float infinite ease-in-out;
-      font-family: var(--font-mono);
     }
 
     @keyframes float {
@@ -158,39 +155,33 @@
       }
     }
 
+
     .landing-content {
       z-index: 1;
       width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
+      max-width: 1100px;
     }
 
     .hero {
-      padding: 8rem 0 6rem;
+      padding: 6rem 0;
     }
 
     .hero .logo {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 4rem;
-      font-weight: 700;
+      font-size: 3rem;
       margin-bottom: 2rem;
       animation: fadeInDown 0.8s ease-out;
-      text-shadow: 0 0 30px rgba(88, 101, 242, 0.4);
     }
 
     .hero .logo span {
-      color: var(--accent-color);
+      color: var(--text-secondary);
     }
 
     .hero-title {
-      font-size: 4rem;
-      font-weight: 800;
+      font-size: 3.5rem;
+      font-weight: 700;
       line-height: 1.1;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
       letter-spacing: -2px;
-      background: linear-gradient(to right, #fff, #a1a1aa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
       animation: fadeInUp 0.8s 0.2s ease-out backwards;
     }
 
@@ -199,14 +190,14 @@
       font-weight: 500;
       color: var(--text-secondary);
       margin-bottom: 2.5rem;
-      height: 2.5rem;
+      height: 2.5rem; /* Set a fixed height to prevent layout shift */
       animation: fadeInUp 0.8s 0.3s ease-out backwards;
     }
 
     .game-name {
-      color: var(--accent-color);
+      color: var(--discord-blurple);
       font-weight: 600;
-      text-shadow: 0 0 15px rgba(88, 101, 242, 0.4);
+      text-shadow: 0 0 10px rgba(88, 101, 242, 0.5);
     }
 
     .game-name::after {
@@ -214,124 +205,102 @@
       display: inline-block;
       margin-left: 4px;
       animation: blink-caret 0.75s step-end infinite;
-      color: var(--accent-color);
+      color: var(--discord-blurple);
     }
 
     @keyframes blink-caret {
-
-      from,
-      to {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: 0;
-      }
+      from, to { opacity: 1; }
+      50% { opacity: 0; }
     }
 
     .tagline {
       font-size: 1.25rem;
       color: var(--text-secondary);
-      margin-bottom: 2.5rem;
+      margin-bottom: 1.5rem;
       max-width: 600px;
       margin-left: auto;
       margin-right: auto;
       line-height: 1.6;
       animation: fadeInUp 0.8s 0.5s ease-out backwards;
     }
-
+    
     .hero-buttons {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 1.5rem;
+      gap: 1rem;
       animation: fadeInUp 0.8s 0.7s ease-out backwards;
     }
-
+    
     .secondary-hero-btn {
-      background-color: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-glass);
+      background-color: transparent;
+      border: 1px solid var(--border-color);
       color: var(--text-secondary);
-      padding: 1rem 2rem;
+      padding: 0.85rem 1.75rem;
       font-size: 1rem;
       font-weight: 600;
-      border-radius: 12px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
       text-decoration: none;
-      font-family: var(--font-main);
+      font-family: 'Inter', sans-serif;
     }
 
     .secondary-hero-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
-      color: #fff;
-      transform: translateY(-2px);
+        border-color: var(--discord-blurple);
+        color: var(--text-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(88, 101, 242, 0.2);
     }
 
     #login-btn {
-      background-color: var(--accent-color);
-      color: #fff;
+      background-color: var(--discord-blurple);
+      color: var(--text-primary);
       border: none;
-      padding: 1rem 2rem;
+      padding: 0.85rem 1.75rem;
       font-size: 1rem;
       font-weight: 600;
-      border-radius: 12px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
       gap: 0.75rem;
-      font-family: var(--font-main);
+      font-family: 'Inter', sans-serif;
       box-shadow: 0 4px 20px rgba(88, 101, 242, 0.3);
     }
 
     #login-btn:hover {
-      background-color: var(--accent-hover);
+      background-color: #4752C4;
       transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(88, 101, 242, 0.4);
+      box-shadow: 0 6px 25px rgba(88, 101, 242, 0.4);
     }
 
     .section-title {
       font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 4rem;
+      font-weight: 600;
+      margin-bottom: 3rem;
       letter-spacing: -1px;
       animation: fadeInUp 0.8s ease-out backwards;
-      background: linear-gradient(to right, #fff, #a1a1aa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
     }
-
+    
     .features {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 2rem;
-      padding: 4rem 0 8rem;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      padding: 4rem 0 6rem;
     }
 
     .feature-card {
-      background: var(--surface-glass);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--border-glass);
-      border-radius: 16px;
-      padding: 2.5rem;
+      background: rgba(20, 20, 20, 0.5);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
       transition: all 0.3s ease;
       animation: fadeInUp 0.8s 0.8s ease-out backwards;
       text-align: left;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .feature-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
     }
 
     .feature-card:nth-child(2) {
@@ -343,45 +312,42 @@
     }
 
     .feature-card:hover {
-      transform: translateY(-8px);
-      border-color: rgba(88, 101, 242, 0.3);
-      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+      transform: translateY(-5px);
+      border-color: rgba(88, 101, 242, 0.5);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
     }
 
     .feature-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 12px;
-      background: rgba(88, 101, 242, 0.1);
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      background-color: var(--surface-color);
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 1.5rem;
-      color: var(--accent-color);
+      color: var(--discord-blurple);
     }
 
     .feature-card h3 {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-      font-weight: 600;
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
     }
 
     .feature-card p {
       color: var(--text-secondary);
-      line-height: 1.7;
-      font-size: 1rem;
+      line-height: 1.6;
     }
 
     .how-it-works {
-      padding: 8rem 0;
-      border-top: 1px solid var(--border-glass);
-      background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.3));
+      padding: 6rem 0;
+      border-top: 1px solid var(--border-color);
     }
 
     .steps-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 3rem;
+      gap: 2rem;
     }
 
     .step-card {
@@ -399,54 +365,49 @@
     }
 
     .step-number {
-      width: 60px;
-      height: 60px;
-      border: 2px solid var(--accent-color);
+      width: 50px;
+      height: 50px;
+      border: 2px solid var(--discord-blurple);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 2rem;
+      margin: 0 auto 1.5rem;
       font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--accent-color);
-      box-shadow: 0 0 20px rgba(88, 101, 242, 0.2);
+      font-weight: 600;
+      color: var(--discord-blurple);
     }
 
     .step-card h3 {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-      font-weight: 600;
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
     }
 
     .step-card p {
       color: var(--text-secondary);
       line-height: 1.6;
-      max-width: 320px;
+      max-width: 300px;
       margin: 0 auto;
     }
-
+    
     /* Scanner Simulator Section */
     .scanner-simulator-section {
-      padding: 8rem 0;
+      padding: 6rem 0;
       animation: fadeInUp 0.8s 0.8s ease-out backwards;
     }
-
     .fake-desktop-container {
       max-width: 1000px;
       height: 600px;
       margin: 0 auto;
       background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-      border: 1px solid var(--border-glass);
-      border-radius: 20px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
       position: relative;
       overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     }
-
     .cheat-icon {
       position: absolute;
       display: flex;
@@ -456,309 +417,298 @@
       color: white;
       text-align: center;
       transition: color 0.3s ease, text-shadow 0.3s ease;
-      font-family: var(--font-main);
+      font-family: 'Inter', sans-serif;
       width: 100px;
       user-select: none;
     }
-
-    .cheat-icon svg {
+    .cheat-icon svg { 
       width: 48px;
       height: 48px;
-      filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
       transition: filter 0.3s ease;
     }
-
-    .cheat-icon span {
-      font-size: 12px;
+    .cheat-icon span { 
+      font-size: 12px; 
       text-shadow: 1px 1px 2px black;
       white-space: nowrap;
     }
-
-    .cheat-icon.detected {
-      color: var(--danger);
-      text-shadow: 0 0 8px var(--danger);
+    .cheat-icon.detected { 
+      color: var(--accent-negative); 
+      text-shadow: 0 0 8px var(--accent-negative); 
     }
-
-    .cheat-icon.detected svg {
-      filter: drop-shadow(0 0 5px var(--danger));
-      color: var(--danger);
+    .cheat-icon.detected svg { 
+      filter: drop-shadow(0 0 5px var(--accent-negative)); 
+      color: var(--accent-negative);
     }
-
     .scanner-window {
-      width: 600px;
-      height: 340px;
-      border-radius: 12px;
+      width: 560px;
+      height: 318px;
+      border-radius: 8px;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      border: 1px solid #000;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
       z-index: 10;
       display: flex;
       flex-direction: column;
-      background-color: #0f0f0f;
+      background-color: #111;
     }
-
     .window-header {
-      background: #1a1a1a;
-      padding: 0.75rem 1rem;
+      background: var(--surface-color);
+      padding: 0.5rem 0.75rem;
       display: flex;
       align-items: center;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid #000;
       user-select: none;
     }
-
     .window-dots {
       display: flex;
       gap: 0.5rem;
     }
-
     .window-dots .dot {
-      width: 12px;
-      height: 12px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
     }
-
-    .window-dots .dot.red {
-      background-color: #ff5f56;
+    .window-dots .dot.red { background-color: #ff5f56; }
+    .window-dots .dot.yellow { background-color: #ffbd2e; }
+    .window-dots .dot.green { background-color: #27c93f; }
+    .window-body { 
+      flex-grow: 1; 
+      background-color: #111;
     }
-
-    .window-dots .dot.yellow {
-      background-color: #ffbd2e;
-    }
-
-    .window-dots .dot.green {
-      background-color: #27c93f;
-    }
-
-    .window-body {
-      flex-grow: 1;
-      background-color: #0f0f0f;
-    }
-
-    .window-body iframe {
-      width: 100%;
-      height: 100%;
+    .window-body iframe { 
+      width: 100%; 
+      height: 100%; 
       border: none;
     }
-
+    
     .tos-button-container {
-      text-align: center;
-      margin: -4rem 0 6rem;
-      animation: fadeInUp 0.8s 1.2s ease-out backwards;
+        text-align: center;
+        margin: -4rem 0 6rem;
+        animation: fadeInUp 0.8s 1.2s ease-out backwards;
     }
 
     /* Pricing Section */
     .pricing-section {
-      padding: 8rem 0;
-      animation: fadeInUp 0.8s 1s ease-out backwards;
+        padding: 6rem 0;
+        animation: fadeInUp 0.8s 1s ease-out backwards;
     }
 
     .pricing-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 2.5rem;
-      justify-content: center;
-      max-width: 900px;
-      margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+        justify-content: center;
+        max-width: 800px;
+        margin: 0 auto;
     }
 
     .pricing-card {
-      background: var(--surface-glass);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--border-glass);
-      border-radius: 20px;
-      padding: 3rem;
-      display: flex;
-      flex-direction: column;
-      text-align: center;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
+        background: rgba(20, 20, 20, 0.5);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 2.5rem;
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
     }
 
     .pricing-card:hover {
-      transform: translateY(-8px);
-      border-color: rgba(88, 101, 242, 0.4);
-      box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5);
+        transform: translateY(-8px);
+        border-color: rgba(88, 101, 242, 0.5);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
     }
 
     .featured-tag {
-      position: absolute;
-      top: 24px;
-      right: -34px;
-      background: linear-gradient(45deg, var(--accent-color), #7b8aff);
-      color: #fff;
-      padding: 0.5rem 0;
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      transform: rotate(45deg);
-      width: 150px;
-      text-align: center;
-      box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);
+        position: absolute;
+        top: 18px;
+        right: -34px;
+        background: linear-gradient(45deg, var(--discord-blurple), #7b8aff);
+        color: var(--text-primary);
+        padding: 0.5rem 0;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transform: rotate(45deg);
+        width: 150px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);
     }
 
+
     .pricing-header {
-      margin-bottom: 2rem;
+        margin-bottom: 2rem;
     }
 
     .pricing-header h3 {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-      font-weight: 700;
+        font-size: 1.75rem;
+        margin-bottom: 0.75rem;
     }
 
     .pricing-header p {
-      color: var(--text-secondary);
-      font-size: 1.1rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
     }
 
     .pricing-list {
-      list-style: none;
-      margin-bottom: 3rem;
-      flex-grow: 1;
+        list-style: none;
+        margin-bottom: 2.5rem;
+        flex-grow: 1;
     }
 
     .pricing-list li {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.25rem 0;
-      border-bottom: 1px solid var(--border-glass);
-      font-size: 1.05rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 1rem;
     }
 
     .pricing-list li:first-child {
-      border-top: 1px solid var(--border-glass);
+        border-top: 1px solid var(--border-color);
     }
 
     .pricing-list li span {
-      color: var(--text-secondary);
+        color: var(--text-secondary);
     }
 
     .pricing-list li strong {
-      font-size: 1.25rem;
-      font-weight: 600;
-      font-family: 'Orbitron', sans-serif;
-      color: #fff;
+        font-size: 1.25rem;
+        font-weight: 600;
+        font-family: 'Orbitron', sans-serif;
     }
-
+    
     .enterprise-pricing-details {
-      margin-bottom: 3rem;
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+        margin-bottom: 2.5rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
     .price-display {
-      display: flex;
-      justify-content: center;
-      align-items: baseline;
-      margin-bottom: 0.5rem;
-      font-family: 'Orbitron', sans-serif;
-      color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: baseline;
+        margin-bottom: 0.5rem;
+        font-family: 'Orbitron', sans-serif;
+        color: var(--text-primary);
     }
 
     .price-display .currency {
-      font-size: 2rem;
-      font-weight: 500;
-      margin-right: 0.25rem;
+        font-size: 1.75rem;
+        font-weight: 500;
+        margin-right: 0.25rem;
     }
 
     .price-display #enterprise-price {
-      font-size: 3.5rem;
-      font-weight: 700;
-      line-height: 1;
+        font-size: 3rem;
+        font-weight: 700;
+        line-height: 1;
     }
 
     .price-period {
-      color: var(--text-secondary);
-      font-size: 1.1rem;
-      margin-bottom: 2.5rem;
+        color: var(--text-secondary);
+        font-size: 1rem;
+        margin-bottom: 2.5rem;
     }
 
     .user-slider-container {
-      width: 100%;
+        width: 100%;
     }
 
     .slider-info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      font-size: 1rem;
-      color: var(--text-secondary);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
     }
 
     .slider-info label {
-      font-weight: 500;
+        font-weight: 500;
     }
 
     #user-count {
-      font-weight: 700;
-      font-size: 1.2rem;
-      color: #fff;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--text-primary);
     }
 
     input[type="range"] {
-      -webkit-appearance: none;
-      width: 100%;
-      height: 6px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 5px;
-      outline: none;
-      transition: opacity 0.2s;
-      cursor: pointer;
+        -webkit-appearance: none;
+        width: 100%;
+        height: 6px;
+        background: var(--border-color);
+        border-radius: 5px;
+        outline: none;
+        transition: opacity 0.2s;
+        cursor: pointer;
     }
 
     input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 24px;
-      height: 24px;
-      background: var(--accent-color);
-      cursor: pointer;
-      border-radius: 50%;
-      border: 4px solid var(--bg-dark);
-      box-shadow: 0 0 15px rgba(88, 101, 242, 0.5);
-      transition: transform 0.2s ease;
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: var(--discord-blurple);
+        cursor: pointer;
+        border-radius: 50%;
+        border: 3px solid var(--sidebar-bg);
+        box-shadow: 0 0 10px rgba(88, 101, 242, 0.5);
+        transition: transform 0.2s ease;
+    }
+    
+    input[type="range"]:hover::-webkit-slider-thumb {
+        transform: scale(1.1);
     }
 
-    input[type="range"]:hover::-webkit-slider-thumb {
-      transform: scale(1.1);
+    input[type="range"]::-moz-range-thumb {
+        width: 14px;
+        height: 14px;
+        background: var(--discord-blurple);
+        cursor: pointer;
+        border-radius: 50%;
+        border: 3px solid var(--sidebar-bg);
+        box-shadow: 0 0 10px rgba(88, 101, 242, 0.5);
     }
 
     .pricing-btn {
-      background-color: transparent;
-      border: 1px solid var(--accent-color);
-      color: var(--accent-color);
-      padding: 1rem 2rem;
-      font-size: 1.1rem;
-      font-weight: 600;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-decoration: none;
-      display: block;
+        background-color: transparent;
+        border: 1px solid var(--discord-blurple);
+        color: var(--discord-blurple);
+        padding: 0.85rem 1.75rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: block;
     }
 
     .pricing-btn:hover {
-      background-color: var(--accent-color);
-      color: #fff;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(88, 101, 242, 0.3);
+        background-color: var(--discord-blurple);
+        color: var(--text-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(88, 101, 242, 0.3);
     }
 
     footer {
       padding: 4rem 0 2rem;
       color: var(--text-secondary);
       font-size: 0.9rem;
-      border-top: 1px solid var(--border-glass);
-      background: #050505;
+      border-top: 1px solid var(--border-color);
     }
-
+    
     .footer-link {
       color: var(--text-secondary);
       text-decoration: none;
@@ -766,7 +716,7 @@
     }
 
     .footer-link:hover {
-      color: #fff;
+      color: var(--text-primary);
       text-decoration: underline;
     }
 
@@ -796,36 +746,38 @@
 
     /* Custom Scrollbar */
     ::-webkit-scrollbar {
-      width: 8px;
+      width: 10px;
+      height: 10px;
     }
 
     ::-webkit-scrollbar-track {
-      background: transparent;
+      background: var(--background-color);
     }
 
     ::-webkit-scrollbar-thumb {
-      background: #333;
-      border-radius: 4px;
+      background-color: var(--border-color);
+      border-radius: 5px;
+      border: 2px solid var(--background-color);
     }
 
     ::-webkit-scrollbar-thumb:hover {
-      background: #444;
+      background-color: var(--text-secondary);
     }
 
     /* Staff Team Button */
     #staff-team-btn {
       position: fixed;
-      bottom: 30px;
+      bottom: 25px;
       left: 50%;
       transform: translateX(-50%);
-      background-color: rgba(20, 20, 20, 0.8);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--border-glass);
+      background-color: rgba(20, 20, 20, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--border-color);
       border-radius: 50px;
       color: var(--text-secondary);
-      padding: 0.85rem 1.75rem;
-      font-size: 0.95rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 0.9rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
@@ -833,616 +785,733 @@
       align-items: center;
       gap: 0.75rem;
       z-index: 999;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
     }
 
     #staff-team-btn:hover {
-      transform: translateX(-50%) translateY(-4px);
-      color: #fff;
-      border-color: var(--accent-color);
-      background-color: rgba(88, 101, 242, 0.15);
-      box-shadow: 0 15px 40px rgba(88, 101, 242, 0.25);
+      transform: translateX(-50%) translateY(-3px);
+      color: var(--text-primary);
+      border-color: var(--discord-blurple);
+      background-color: rgba(88, 101, 242, 0.1);
+      box-shadow: 0 8px 30px rgba(88, 101, 242, 0.2);
     }
 
-    /* Discord Sidebar */
+    /* Discord Members Sidebar */
     #discord-sidebar-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(4px);
-      z-index: 2000;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      z-index: 1000;
       opacity: 0;
       visibility: hidden;
-      transition: all 0.3s ease;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
     }
 
-    #discord-sidebar-overlay.open {
+    body.sidebar-open #discord-sidebar-overlay {
       opacity: 1;
       visibility: visible;
     }
 
-    #discord-sidebar {
+    #discord-sidebar-content {
       position: fixed;
       top: 0;
-      right: -400px;
-      width: 380px;
+      right: -420px;
+      width: 100%;
+      max-width: 400px;
       height: 100%;
-      background: rgba(10, 10, 10, 0.95);
-      backdrop-filter: blur(20px);
-      border-left: 1px solid var(--border-glass);
-      z-index: 2001;
-      transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      background-color: var(--surface-color);
+      border-left: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
-      box-shadow: -20px 0 50px rgba(0, 0, 0, 0.5);
+      box-shadow: -10px 0 40px rgba(0,0,0,0.5);
+      transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      z-index: 1001;
     }
 
-    #discord-sidebar.open {
+    body.sidebar-open #discord-sidebar-content {
       right: 0;
     }
 
-    .discord-header {
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--border-glass);
+    .sidebar-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
     }
 
-    .discord-header h3 {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+    .sidebar-header h2 {
+      font-size: 1.25rem;
     }
 
-    #close-sidebar-btn {
+    #discord-sidebar-close {
       background: none;
       border: none;
       color: var(--text-secondary);
-      font-size: 1.5rem;
+      font-size: 1.75rem;
       cursor: pointer;
-      transition: color 0.2s;
+      line-height: 1;
+      transition: color 0.2s ease;
     }
 
-    #close-sidebar-btn:hover {
-      color: #fff;
+    #discord-sidebar-close:hover {
+      color: var(--text-primary);
     }
 
-    .discord-members-list {
-      flex-grow: 1;
+    #discord-members-list {
       overflow-y: auto;
       padding: 1rem;
-      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .loader-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+      gap: 1rem;
+      color: var(--text-secondary);
     }
 
-    .discord-member {
+    .loader {
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--border-color);
+      border-top-color: var(--discord-blurple);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg {
+      text-align: center;
+      color: var(--accent-warning);
+    }
+
+    .member-item {
       display: flex;
       align-items: center;
       gap: 1rem;
-      padding: 0.75rem;
-      border-radius: 8px;
-      transition: background 0.2s;
-      margin-bottom: 0.5rem;
     }
 
-    .discord-member:hover {
-      background: rgba(255, 255, 255, 0.03);
+    .member-avatar-container {
+      position: relative;
+      flex-shrink: 0;
     }
 
     .member-avatar {
-      position: relative;
-      width: 40px;
-      height: 40px;
-    }
-
-    .member-avatar img {
-      width: 100%;
-      height: 100%;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
-      object-fit: cover;
+      border: 2px solid var(--border-color);
     }
 
-    .member-status {
+    .status-indicator {
       position: absolute;
-      bottom: -2px;
-      right: -2px;
+      bottom: 0;
+      right: 0;
       width: 14px;
       height: 14px;
       border-radius: 50%;
-      border: 3px solid #0a0a0a;
+      border: 3px solid var(--surface-color);
     }
-
-    .status-online {
-      background-color: #23a55a;
-    }
-
-    .status-idle {
-      background-color: #f0b232;
-    }
-
-    .status-dnd {
-      background-color: #f23f43;
-    }
-
-    .status-offline {
-      background-color: #80848e;
-    }
+    .status-indicator.online { background-color: var(--discord-online); }
+    .status-indicator.idle { background-color: var(--discord-idle); }
+    .status-indicator.dnd { background-color: var(--discord-dnd); }
+    .status-indicator.offline { background-color: var(--discord-offline); }
 
     .member-info {
       display: flex;
       flex-direction: column;
+      gap: 0.25rem;
+      overflow: hidden;
     }
 
     .member-name {
       font-weight: 600;
-      color: #fff;
-      font-size: 0.95rem;
+      font-size: 1rem;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
 
-    .member-role {
-      font-size: 0.75rem;
+    .member-roles {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .role-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .role-sphere {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .role-tag span {
+      font-size: 0.85rem;
       color: var(--text-secondary);
-      margin-top: 2px;
+      font-weight: 500;
     }
 
-    .role-badge {
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      margin-left: 0.5rem;
-      vertical-align: middle;
+    @media (min-width: 992px) {
+      .steps-container {
+        grid-template-columns: repeat(3, 1fr);
+      }
     }
 
-    .discord-footer {
-      padding: 1.5rem;
-      border-top: 1px solid var(--border-glass);
-      text-align: center;
-    }
-
-    .join-discord-btn {
-      display: block;
-      background: var(--accent-color);
-      color: #fff;
-      text-decoration: none;
-      padding: 0.85rem;
-      border-radius: 8px;
-      font-weight: 600;
-      transition: all 0.2s;
-    }
-
-    .join-discord-btn:hover {
-      background: var(--accent-hover);
-      transform: translateY(-2px);
-    }
-
-    /* Responsive */
     @media (max-width: 768px) {
       .hero-title {
         font-size: 2.5rem;
       }
 
-      .hero .logo {
-        font-size: 2.5rem;
+      .animated-sub-title {
+        font-size: 1.25rem;
+        height: 2rem;
+      }
+      
+      .tagline {
+        font-size: 1rem;
+      }
+      
+      #staff-team-btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.8rem;
+        bottom: 15px;
       }
 
+      #discord-sidebar-content {
+        max-width: 320px;
+        right: -340px;
+      }
+      
       .pricing-container {
-        grid-template-columns: 1fr;
-      }
-
-      .scanner-window {
-        width: 100%;
-        height: 250px;
+          grid-template-columns: 1fr;
+          max-width: 400px;
       }
     }
   </style>
 </head>
-<!-- Body content preserved exactly as is, just updated CSS -->
 
 <body>
   <div id="true-background"></div>
   <div id="background-glow"></div>
-  <div id="background-animations">
-    <!-- JS will populate floating symbols -->
-  </div>
+  <div id="background-animations"></div>
 
-  <div id="login-container">
+  <div id="login-container" class="hidden">
     <div class="landing-content">
-      <section class="hero">
+      <header class="hero">
         <div class="logo">
           &lt;<span>/</span>async&gt;
         </div>
-        <h1 class="hero-title">
-          Next-Gen Anti-Cheat <br> for <span class="game-name" id="typing-text">FiveM</span>
-        </h1>
-        <div class="animated-sub-title">
-          Detect. Analyze. Protect.
-        </div>
+        <h1 class="hero-title">Next-Gen Security, Seamlessly Integrated.</h1>
         <p class="tagline">
-          The most advanced external scanning tool designed to catch hidden cheats, bypasses, and malicious actors in
-          real-time.
+          Ensure fair play and stop unwanted intrusions with our advanced anti-cheat solution.
         </p>
+        <p class="animated-sub-title">for <span id="game-name-anim" class="game-name"></span></p>
         <div class="hero-buttons">
-          <a href="/auth/discord" id="login-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+          <button id="login-btn">
+            <svg width="24" height="24" viewBox="0 -20 256 256" fill="currentColor" version="1.1"
+              xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+              preserveAspectRatio="xMidYMid">
+              <g>
+                <path
+                  d="M216.856339,16.5966031 C200.285002,8.84328665 182.566144,3.2084988 164.041564,0 C161.766523,4.11318106 159.108624,9.64549908 157.276099,14.0464379 C137.583995,11.0849896 118.072967,11.0849896 98.7430163,14.0464379 C96.9108417,9.64549908 94.1925838,4.11318106 91.8971895,0 C73.3526068,3.2084988 55.6133949,8.86399117 39.0420583,16.6376612 C5.61752293,67.146514 -3.4433191,116.400813 1.08711069,164.955721 C23.2560196,181.510915 44.7403634,191.567697 65.8621325,198.148576 C71.0772151,190.971126 75.7283628,183.341335 79.7352139,175.300261 C72.104019,172.400575 64.7949724,168.822202 57.8887866,164.667963 C59.7209612,163.310589 61.5131304,161.891452 63.2445898,160.431257 C105.36741,180.133187 151.134928,180.133187 192.754523,160.431257 C194.506336,161.891452 196.298154,163.310589 198.110326,164.667963 C191.183787,168.842556 183.854737,172.420929 176.223542,175.320965 C180.230393,183.341335 184.861538,190.991831 190.096624,198.16893 C211.238746,191.588051 232.743023,181.531619 254.911949,164.955721 C260.227747,108.668201 245.831087,59.8662432 216.856339,16.5966031 Z M85.4738752,135.09489 C72.8290281,135.09489 62.4592217,123.290155 62.4592217,108.914901 C62.4592217,94.5396472 72.607595,82.7145587 85.4738752,82.7145587 C98.3405064,82.7145587 108.709962,94.5189427 108.488529,108.914901 C108.508531,123.290155 98.3405064,135.09489 85.4738752,135.09489 Z M170.525237,135.09489 C157.88039,135.09489 147.510584,123.290155 147.510584,108.914901 C147.510584,94.5396472 157.658606,82.7145587 170.525237,82.7145587 C183.391518,82.7145587 193.761324,94.5189427 193.539891,108.914901 C193.539891,123.290155 183.391518,135.09489 170.525237,135.09489 Z">
+                </path>
+              </g>
             </svg>
             Login with Discord
-          </a>
-          <a href="#features" class="secondary-hero-btn">Learn More</a>
+          </button>
+        </div>
+      </header>
+      
+      <section class="scanner-simulator-section">
+        <h2 class="section-title">Experience the Scan</h2>
+        <div class="fake-desktop-container">
+            <!-- Cheat Icons -->
+            <div class="cheat-icon" style="top: 10%; left: 10%;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>Eulen.exe</span>
+            </div>
+            <div class="cheat-icon" style="top: 30%; left: 5%;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>RedEngine.dll</span>
+            </div>
+             <div class="cheat-icon" style="top: 55%; left: 12%;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>Script.gg Loader</span>
+            </div>
+             <div class="cheat-icon" style="top: 15%; left: 80%;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>Kayser.gg</span>
+            </div>
+             <div class="cheat-icon" style="top: 45%; left: 85%;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>Hx Hider</span>
+            </div>
+            <div class="cheat-icon" style="top: 80%; left: 20%;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>Nexus.AIO</span>
+            </div>
+             <div class="cheat-icon" style="top: 75%; left: 78%;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>Orion.dll</span>
+            </div>
+
+            <!-- Scanner Window -->
+            <div class="scanner-window">
+                <div class="window-header">
+                    <div class="window-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                </div>
+                <div class="window-body">
+                    <iframe src="/testscan" title="Scanner Simulator"></iframe>
+                </div>
+            </div>
         </div>
       </section>
 
-      <section id="features" class="features">
+      <div class="tos-button-container">
+        <a href="/tos" target="_blank" class="secondary-hero-btn">Terms of Service</a>
+      </div>
+
+      <section class="pricing-section">
+        <h2 class="section-title">Choose Your Plan</h2>
+        <div class="pricing-container">
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <h3>Personal License</h3>
+                    <p>For individual users and server owners.</p>
+                </div>
+                <ul class="pricing-list">
+                    <li><span>1 Month</span><strong>€8.99</strong></li>
+                    <li><span>6 Months</span><strong>€39.99</strong></li>
+                    <li><span>1 Year</span><strong>€69.99</strong></li>
+                </ul>
+                <a href="https://discord.gg/asyncac" target="_blank" rel="noopener noreferrer" class="pricing-btn">Purchase Now</a>
+            </div>
+            <div class="pricing-card featured">
+                <div class="featured-tag">Best Value</div>
+                <div class="pricing-header">
+                    <h3>Enterprise License</h3>
+                    <p>For teams and growing communities.</p>
+                </div>
+                <div class="enterprise-pricing-details">
+                    <div class="price-display">
+                        <span class="currency">€</span><span id="enterprise-price">79.99</span>
+                    </div>
+                    <div class="price-period">for 6 months</div>
+                    
+                    <div class="user-slider-container">
+                        <div class="slider-info">
+                            <label for="user-slider">Number of Users:</label>
+                            <span id="user-count">6</span>
+                        </div>
+                        <input type="range" id="user-slider" min="4" max="10" value="6" step="1" aria-label="Number of users for Enterprise License">
+                    </div>
+                </div>
+                <a href="https://discord.gg/asyncac" target="_blank" rel="noopener noreferrer" class="pricing-btn">Purchase Now</a>
+            </div>
+        </div>
+      </section>
+
+      <section class="features">
         <div class="feature-card">
           <div class="feature-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-              <path d="m9 12 2 2 4-4"></path>
+              <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+              <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+              <path d="M18 12a2 2 0 0 0-2 2c0 1.05.8 2.3 2 4 .5-2 1.5-3 2-4a2 2 0 0 0-2-2Z" />
+            </svg>
+          </div>
+          <h3>Real-Time Detection</h3>
+          <p>Our engine scans for anomalies and known cheat signatures in real-time, stopping threats before they impact your <strong>gaming server</strong>.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+              <polyline points="14 2 14 8 20 8" />
+              <path d="M12 18v-6" />
+              <path d="m9 15 3-3 3 3" />
             </svg>
           </div>
           <h3>Deep System Analysis</h3>
-          <p>Scans memory, processes, and hidden files to detect unauthorized software, injectors, and scripts that
-            bypass standard anti-cheats.</p>
+          <p>Go beyond surface-level scans. &lt;/async&gt; integrates deeply to analyze memory, processes, and network traffic for a comprehensive <strong>anti-cheat</strong> defense.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              <polyline points="16 18 22 12 16 6" />
+              <polyline points="8 6 2 12 8 18" />
             </svg>
           </div>
-          <h3>Real-Time Reporting</h3>
-          <p>Get instant, detailed reports delivered directly to your dashboard and Discord server, complete with
-            evidence and risk assessments.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-            </svg>
-          </div>
-          <h3>Secure & Private</h3>
-          <p>Built with privacy in mind. We only scan for cheat-related data and ensure all reports are securely stored
-            and accessible only to you.</p>
-        </div>
-      </section>
-
-      <section class="scanner-simulator-section">
-        <h2 class="section-title">See It In Action</h2>
-        <div class="fake-desktop-container">
-          <div class="cheat-icon" style="top: 20%; left: 15%;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path
-                d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z">
-              </path>
-            </svg>
-            <span>Injector.exe</span>
-          </div>
-          <div class="cheat-icon" style="bottom: 25%; right: 20%;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path
-                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
-              </path>
-              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-              <line x1="12" y1="22.08" x2="12" y2="12"></line>
-            </svg>
-            <span>CheatMenu.dll</span>
-          </div>
-
-          <div class="scanner-window">
-            <div class="window-header">
-              <div class="window-dots">
-                <div class="dot red"></div>
-                <div class="dot yellow"></div>
-                <div class="dot green"></div>
-              </div>
-              <span style="margin-left: 1rem; font-size: 0.8rem; color: #888; font-family: monospace;">Scanner
-                Terminal</span>
-            </div>
-            <div class="window-body">
-              <iframe src="/testscan.html" title="Scanner Simulation"></iframe>
-            </div>
-          </div>
+          <h3>Developer Friendly</h3>
+          <p>With a simple API and seamless Discord integration, protecting your <strong>FiveM or game server community</strong> has never been easier.</p>
         </div>
       </section>
 
       <section class="how-it-works">
-        <h2 class="section-title">How It Works</h2>
+        <h2 class="section-title">Server Protection in 3 Simple Steps</h2>
         <div class="steps-container">
           <div class="step-card">
             <div class="step-number">1</div>
-            <h3>Generate PIN</h3>
-            <p>Log in to your dashboard and generate a unique, one-time PIN for the user you want to scan.</p>
+            <h3>Connect & Authorize</h3>
+            <p>Securely log in with your Discord account to grant &lt;/async&gt; permission to begin.</p>
           </div>
           <div class="step-card">
             <div class="step-number">2</div>
-            <h3>Run Scanner</h3>
-            <p>The user downloads the lightweight scanner client, enters the PIN, and the scan begins automatically.</p>
+            <h3>Initiate Scan</h3>
+            <p>Start a comprehensive <strong>PC scan</strong> of a player's system with a single click from your personalized dashboard.</p>
           </div>
           <div class="step-card">
             <div class="step-number">3</div>
-            <h3>View Results</h3>
-            <p>Within seconds, view a comprehensive report on your dashboard detailing any detected threats.</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="pricing-section">
-        <h2 class="section-title">Simple, Transparent Pricing</h2>
-        <div class="pricing-container">
-          <!-- Free Plan -->
-          <div class="pricing-card">
-            <div class="pricing-header">
-              <h3>Community</h3>
-              <p>For small servers and startups</p>
-            </div>
-            <div class="price-display">
-              <span class="currency">€</span>
-              <span id="enterprise-price">0</span>
-            </div>
-            <div class="price-period">Forever Free</div>
-            <ul class="pricing-list">
-              <li><span>Scans per Month</span><strong>50</strong></li>
-              <li><span>History Retention</span><strong>7 Days</strong></li>
-              <li><span>Support</span><strong>Community</strong></li>
-              <li><span>API Access</span><strong>-</strong></li>
-            </ul>
-            <a href="/auth/discord" class="pricing-btn">Get Started</a>
-          </div>
-
-          <!-- Enterprise Plan -->
-          <div class="pricing-card">
-            <div class="featured-tag">Popular</div>
-            <div class="pricing-header">
-              <h3>Enterprise</h3>
-              <p>For growing and large communities</p>
-            </div>
-
-            <div class="enterprise-pricing-details">
-              <div class="price-display">
-                <span class="currency">€</span>
-                <span id="enterprise-price-display">15</span>
-              </div>
-              <div class="price-period">per month</div>
-
-              <div class="user-slider-container">
-                <div class="slider-info">
-                  <label>Active Users</label>
-                  <span id="user-count-display">Up to 500</span>
-                </div>
-                <input type="range" id="pricing-slider" min="1" max="4" value="1" step="1">
-              </div>
-            </div>
-
-            <ul class="pricing-list">
-              <li><span>Scans per Month</span><strong>Unlimited</strong></li>
-              <li><span>History Retention</span><strong>Unlimited</strong></li>
-              <li><span>Support</span><strong>Priority 24/7</strong></li>
-              <li><span>API Access</span><strong>Full Access</strong></li>
-            </ul>
-            <a href="/auth/discord" class="pricing-btn"
-              style="background: var(--accent-color); color: white; border: none;">Upgrade Now</a>
+            <h3>Review & Act</h3>
+            <p>Get detailed reports on potential <strong>cheats and threats</strong>, allowing you to take immediate, decisive action to maintain a fair <strong>gaming environment</strong>.</p>
           </div>
         </div>
       </section>
 
       <footer>
-        <p>&copy; 2025 </async> Scanner. All rights reserved.</p>
-        <div style="margin-top: 1rem;">
-          <a href="/tos.html" class="footer-link">Terms of Service</a> |
-          <a href="/privacy.html" class="footer-link">Privacy Policy</a>
-        </div>
+        <p>&copy; 2025 &lt;/async&gt; Scanner. All rights reserved. | <a href="/faq" class="footer-link">FAQ</a></p>
       </footer>
     </div>
   </div>
 
-  <button id="staff-team-btn">
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-      <circle cx="9" cy="7" r="4"></circle>
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-    </svg>
-    Meet the Staff
+  <button id="staff-team-btn" title="View Staff Team">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <span>Staff Team</span>
   </button>
 
-  <div id="discord-sidebar-overlay"></div>
-  <div id="discord-sidebar">
-    <div class="discord-header">
-      <h3>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="#5865F2">
-          <path
-            d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z" />
-        </svg>
-        Staff Online
-      </h3>
-      <button id="close-sidebar-btn">&times;</button>
-    </div>
-    <ul class="discord-members-list" id="discord-members-list">
-      <!-- Populated by JS -->
-      <li style="text-align:center; color: #888; margin-top: 2rem;">Loading staff...</li>
-    </ul>
-    <div class="discord-footer">
-      <a href="https://discord.gg/example" target="_blank" class="join-discord-btn">Join Our Discord</a>
+  <div id="discord-sidebar-overlay">
+    <div id="discord-sidebar-content">
+      <div class="sidebar-header">
+        <h2>Staff Team</h2>
+        <button id="discord-sidebar-close">&times;</button>
+      </div>
+      <div id="discord-members-list">
+        <div class="loader-container">
+          <div class="loader"></div>
+          <p>Loading Members...</p>
+        </div>
+      </div>
     </div>
   </div>
 
-  <script>
-    // Floating Symbols Animation
-    const symbols = ['</>', '{ }', '01', '[]', '#', '//', 'SCAN', '🛡️', '⚡'];
-    const container = document.getElementById('background-animations');
+  <script type="module">
+    // --- Landing Page & Auth Logic ---
 
-    function createSymbol() {
-      const symbol = document.createElement('div');
-      symbol.classList.add('floating-symbol');
-      symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-
-      const size = Math.random() * 20 + 10;
-      symbol.style.fontSize = `${size}px`;
-
-      symbol.style.left = `${Math.random() * 100}vw`;
-      symbol.style.top = `${Math.random() * 100}vh`;
-
-      const duration = Math.random() * 10 + 10;
-      symbol.style.animationDuration = `${duration}s`;
-
-      container.appendChild(symbol);
-    }
-
-    for (let i = 0; i < 30; i++) {
-      createSymbol();
-    }
-
-    // Typing Effect
-    const games = ["FiveM", "DayZ", "Minecraft", "Rust"];
-    let gameIndex = 0;
-    let charIndex = 0;
-    let isDeleting = false;
-    const typingText = document.getElementById("typing-text");
-
-    function type() {
-      const currentText = games[gameIndex];
-
-      if (isDeleting) {
-        typingText.textContent = currentText.substring(0, charIndex - 1);
-        charIndex--;
-      } else {
-        typingText.textContent = currentText.substring(0, charIndex + 1);
-        charIndex++;
-      }
-
-      if (!isDeleting && charIndex === currentText.length) {
-        isDeleting = true;
-        setTimeout(type, 2000);
-      } else if (isDeleting && charIndex === 0) {
-        isDeleting = false;
-        gameIndex = (gameIndex + 1) % games.length;
-        setTimeout(type, 500);
-      } else {
-        setTimeout(type, isDeleting ? 100 : 200);
+    /**
+     * Creates animated floating symbols for the background effect.
+     */
+    function createFloatingSymbols() {
+      const container = document.getElementById('background-animations');
+      if (!container) return;
+      const symbolCount = 20; // Number of symbols
+      for (let i = 0; i < symbolCount; i++) {
+        const symbol = document.createElement('span');
+        symbol.classList.add('floating-symbol');
+        symbol.innerHTML = '&lt;/&gt;';
+        symbol.style.left = `${Math.random() * 100}vw`;
+        symbol.style.top = `${Math.random() * 100}vh`;
+        symbol.style.fontSize = `${Math.random() * 20 + 10}px`;
+        symbol.style.animationDuration = `${Math.random() * 15 + 10}s`;
+        symbol.style.animationDelay = `${Math.random() * 5}s`;
+        container.appendChild(symbol);
       }
     }
+    
+    /**
+     * Creates a typing animation for a list of words.
+     * @param {HTMLElement} el The element to animate.
+     * @param {string[]} words The words to cycle through.
+     */
+    function typingAnimation(el, words) {
+        if (!el || !words || words.length === 0) return;
 
-    setTimeout(type, 1000);
+        let wordIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typeSpeed = 150;
+        const deleteSpeed = 100;
+        const pauseTime = 1500;
 
-    // Pricing Slider Logic
-    const slider = document.getElementById('pricing-slider');
-    const priceDisplay = document.getElementById('enterprise-price-display');
-    const userCountDisplay = document.getElementById('user-count-display');
+        function type() {
+            const currentWord = words[wordIndex];
+            let text = '';
 
-    if (slider && priceDisplay && userCountDisplay) {
-      const pricingTiers = [
-        { users: 'Up to 500', price: 15 },
-        { users: 'Up to 1,000', price: 30 },
-        { users: 'Up to 2,500', price: 60 },
-        { users: 'Unlimited', price: 120 }
-      ];
+            if (isDeleting) {
+                text = currentWord.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                text = currentWord.substring(0, charIndex + 1);
+                charIndex++;
+            }
 
-      slider.addEventListener('input', (e) => {
-        const tierIndex = parseInt(e.target.value) - 1;
-        const tier = pricingTiers[tierIndex];
+            el.textContent = text;
 
-        // Animate numbers
-        animateValue(priceDisplay, parseInt(priceDisplay.textContent), tier.price, 300);
+            let speed = isDeleting ? deleteSpeed : typeSpeed;
 
-        userCountDisplay.style.opacity = 0;
-        setTimeout(() => {
-          userCountDisplay.textContent = tier.users;
-          userCountDisplay.style.opacity = 1;
-        }, 150);
-      });
-    }
+            if (!isDeleting && charIndex === currentWord.length) {
+                speed = pauseTime;
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                wordIndex = (wordIndex + 1) % words.length;
+                speed = 500; // Pause before typing next word
+            }
 
-    function animateValue(obj, start, end, duration) {
-      let startTimestamp = null;
-      const step = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        obj.innerHTML = Math.floor(progress * (end - start) + start);
-        if (progress < 1) {
-          window.requestAnimationFrame(step);
+            setTimeout(type, speed);
         }
-      };
-      window.requestAnimationFrame(step);
+        type();
     }
 
-    // Staff Sidebar Logic
-    const staffBtn = document.getElementById('staff-team-btn');
-    const sidebar = document.getElementById('discord-sidebar');
-    const overlay = document.getElementById('discord-sidebar-overlay');
-    const closeBtn = document.getElementById('close-sidebar-btn');
-    const membersList = document.getElementById('discord-members-list');
+    /**
+     * Initializes the landing page, setting up the login button to redirect to the backend.
+     */
+    function initLandingPage() {
+      const loginBtn = document.getElementById('login-btn');
+      if (!loginBtn) return;
 
-    function toggleSidebar() {
-      const isOpen = sidebar.classList.contains('open');
-      if (isOpen) {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('open');
-        document.body.classList.remove('sidebar-open');
-      } else {
-        sidebar.classList.add('open');
-        overlay.classList.add('open');
-        document.body.classList.add('sidebar-open');
-        loadStaffMembers();
+      loginBtn.addEventListener('click', () => {
+        // Redirect to the backend for Discord OAuth2 login
+        window.location.href = '/login';
+      });
+
+      createFloatingSymbols();
+    }
+
+    /**
+     * Main application entry point. Checks user's login status and either redirects
+     * to the dashboard or initializes the landing page.
+     */
+    async function main() {
+      const loginContainer = document.getElementById('login-container');
+      if (!loginContainer) {
+        console.error('Essential application containers not found!');
+        return;
+      }
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+        const response = await fetch('/api/user', {
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          const user = await response.json();
+          if (user.is_banned) {
+            // User is banned, redirect to the unlicensed page which handles the banned message
+            window.location.href = '/unlicensed';
+            return;
+          }
+          if (user.has_license) {
+            // User is logged in and licensed, redirect to the dashboard
+            window.location.href = '/dashboard';
+            return;
+          } else {
+            // User is logged in but unlicensed, redirect to the unlicensed page
+            window.location.href = '/unlicensed';
+            return;
+          }
+        } else {
+          // User is not logged in, show the landing page
+          loginContainer.classList.remove('hidden');
+          initLandingPage();
+        }
+      } catch (error) {
+        console.error("Error checking login status:", error);
+        // Always show the login page on any error
+        loginContainer.classList.remove('hidden');
+        initLandingPage();
       }
     }
 
-    staffBtn.addEventListener('click', toggleSidebar);
-    closeBtn.addEventListener('click', toggleSidebar);
-    overlay.addEventListener('click', toggleSidebar);
+    /**
+     * Safely escapes HTML special characters to prevent incorrect rendering or XSS.
+     * @param {string} str The string to escape.
+     * @returns {string} The escaped string.
+     */
+    function escapeHTML(str) {
+        if (!str) return '';
+        const p = document.createElement('p');
+        p.textContent = str;
+        return p.innerHTML;
+    }
 
-    // Load Staff Members from API
-    async function loadStaffMembers() {
+    /**
+     * Fetches Discord member data from the backend and populates the modal.
+     */
+    async function fetchAndDisplayDiscordMembers() {
+      const listContainer = document.getElementById('discord-members-list');
       try {
-        membersList.innerHTML = '<li style="text-align:center; color: #888; margin-top: 2rem;">Loading staff...</li>';
-        
         const response = await fetch('/api/discord-members');
         if (!response.ok) {
-          throw new Error('Failed to load staff members');
+          throw new Error(`Server responded with ${response.status}`);
         }
+        const members = await response.json();
         
-        const data = await response.json();
-        
-        if (!data.members || data.members.length === 0) {
-          membersList.innerHTML = '<li style="text-align:center; color: #888; margin-top: 2rem;">No staff members online</li>';
+        const staffRoleIds = new Set([
+            '1429092700195389551',
+            '1429503954831806604',
+            '1430980197426925599',
+            '1429503432942817340',
+            '1430654337830359170',
+            '1429092698765135923',
+            '1429092704133840937'
+        ]);
+
+        const staffMembers = members.filter(member =>
+            member.roles.some(role => staffRoleIds.has(role.id))
+        );
+
+        window.membersCache = staffMembers; // Cache the filtered result
+
+        if (!staffMembers || staffMembers.length === 0) {
+          listContainer.innerHTML = '<p class="error-msg">Could not load staff members at this time.</p>';
           return;
         }
 
-        membersList.innerHTML = data.members.map(member => `
-          <li class="discord-member">
-            <div class="member-avatar">
-              <img src="${member.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(member.name) + '&background=5865F2&color=fff'}" 
-                   alt="${member.name}"
-                   onerror="this.src='https://ui-avatars.com/api/?name=' + encodeURIComponent('${member.name}') + '&background=5865F2&color=fff'">
-              <div class="member-status status-${member.status || 'offline'}"></div>
+        listContainer.innerHTML = staffMembers.map(member => {
+          const safeUsername = escapeHTML(member.username);
+          const rolesHTML = member.roles
+            .filter(role => role.name && role.name.trim() !== '' && role.name !== '@everyone') // Filter out roles with no name
+            .map(role => {
+              const sphereColor = role.color === '#000000' ? 'var(--border-color)' : role.color;
+              return `<div class="role-tag">
+                          <span class="role-sphere" style="background-color: ${sphereColor};"></span>
+                          <span>${escapeHTML(role.name)}</span>
+                      </div>`;
+            }).join('');
+
+          return `
+            <div class="member-item">
+                <div class="member-avatar-container">
+                    <img src="${member.avatar_url}" alt="${safeUsername}" class="member-avatar">
+                    <span class="status-indicator ${member.status}"></span>
+                </div>
+                <div class="member-info">
+                    <span class="member-name">${safeUsername}</span>
+                    <div class="member-roles">${rolesHTML}</div>
+                </div>
             </div>
-            <div class="member-info">
-              <span class="member-name">${member.name}</span>
-              <span class="member-role">${member.role || 'Member'}</span>
-            </div>
-          </li>
-        `).join('');
+          `;
+        }).join('');
+
       } catch (error) {
-        console.error('Error loading staff members:', error);
-        membersList.innerHTML = '<li style="text-align:center; color: #888; margin-top: 2rem;">Failed to load staff members</li>';
+        console.error("Failed to fetch Discord members:", error);
+        listContainer.innerHTML = '<p class="error-msg">Failed to load staff members. Please try again later.</p>';
       }
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize floating symbols animation
+      createFloatingSymbols();
+      
+      // --- Scanner Simulator Logic ---
+      window.addEventListener('message', (event) => {
+        // Security check: ensure the message is from our iframe's origin
+        if (event.origin !== window.location.origin) {
+            return;
+        }
+        if (event.data === 'scanComplete') {
+            const cheatIcons = document.querySelectorAll('.cheat-icon');
+            cheatIcons.forEach(icon => {
+                icon.classList.add('detected');
+            });
+        }
+      });
+
+      // --- Discord Sidebar Logic ---
+      const fab = document.getElementById('staff-team-btn');
+      const sidebarOverlay = document.getElementById('discord-sidebar-overlay');
+      const sidebarClose = document.getElementById('discord-sidebar-close');
+
+      const openSidebar = () => {
+        document.body.classList.add('sidebar-open');
+        if (!window.membersCache) { // Use a global-like cache attached to window
+          fetchAndDisplayDiscordMembers();
+        }
+      };
+
+      const closeSidebar = () => {
+        document.body.classList.remove('sidebar-open');
+      };
+      
+      fab.addEventListener('click', openSidebar);
+      sidebarClose.addEventListener('click', closeSidebar);
+      sidebarOverlay.addEventListener('click', (e) => {
+        if (e.target === sidebarOverlay) {
+          closeSidebar();
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === "Escape" && document.body.classList.contains('sidebar-open')) {
+            closeSidebar();
+        }
+      });
+
+      // --- Pricing Slider Logic ---
+      const userSlider = document.getElementById('user-slider');
+      const userCountEl = document.getElementById('user-count');
+      const enterprisePriceEl = document.getElementById('enterprise-price');
+
+      if (userSlider && userCountEl && enterprisePriceEl) {
+          const priceMap = {
+              4: '55.99',
+              5: '67.99',
+              6: '79.99',
+              7: '89.99',
+              8: '99.99',
+              9: '109.99',
+              10: '119.99'
+          };
+
+          const updatePrice = () => {
+              const userCount = userSlider.value;
+              userCountEl.textContent = userCount;
+              enterprisePriceEl.textContent = priceMap[userCount];
+          };
+
+          userSlider.addEventListener('input', updatePrice);
+          
+          // Initial call to set default values
+          updatePrice();
+      }
+
+      // --- Start the typing animation ---
+      const gameNameEl = document.getElementById('game-name-anim');
+      const games = ['FiveM', 'DayZ', 'Minecraft'];
+      typingAnimation(gameNameEl, games);
+
+      // --- Start the application ---
+      main();
+    });
   </script>
 </body>
 
