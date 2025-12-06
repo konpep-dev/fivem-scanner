@@ -1,673 +1,311 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings | </async> Scanner</title>
-    <script src="security.js"></script>
-    <script src="notifications.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700&family=JetBrains+Mono:wght@400&display=swap"
-        rel="stylesheet">
-    <style>
-        :root {
-            --bg-dark: #050505;
-            --bg-panel: #0a0a0a;
-            --surface-glass: rgba(20, 20, 20, 0.6);
-            --surface-glass-hover: rgba(30, 30, 30, 0.7);
-            --border-glass: rgba(255, 255, 255, 0.08);
-            --text-primary: #ffffff;
-            --text-secondary: #a1a1aa;
-            --primary-glow: rgba(88, 101, 242, 0.5);
-            --accent-color: #5865F2;
-            --accent-hover: #4752C4;
-            --success: #10B981;
-            --danger: #EF4444;
-            --warning: #F59E0B;
-            --font-main: 'Inter', sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings | </async> Scanner</title>
+  <script src="security.js"></script>
+  <script src="notifications.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --background-color: #0A0A0A;
+      --sidebar-bg: #000000;
+      --surface-color: #141414;
+      --border-color: #2A2A2A;
+      --text-primary: #FFFFFF;
+      --text-secondary: #A0A0A0;
+      --accent-positive: #10B981;
+      --accent-negative: #EF4444;
+      --accent-warning: #F59E0B;
+      --discord-blurple: #5865F2;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; width: 100%; }
+    body {
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      background-color: var(--background-color);
+    }
+    .hidden { display: none !important; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: var(--background-color); }
+    ::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 5px; border: 2px solid var(--background-color); }
+    ::-webkit-scrollbar-thumb:hover { background-color: var(--text-secondary); }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    /* App Layout */
+    #app-container { display: flex; height: 100vh; width: 100vw; overflow: hidden; position: fixed; top: 0; left: 0; background-color: var(--background-color); }
+    .sidebar { width: 240px; background-color: var(--sidebar-bg); border-right: 1px solid var(--border-color); padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; flex-shrink: 0; }
+    .sidebar .logo { font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 3rem; letter-spacing: -1px; }
+    .logo span { color: var(--text-secondary); }
+    .nav-links { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; flex-grow: 1; }
+    .nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 6px; text-decoration: none; color: var(--text-secondary); font-weight: 500; transition: all 0.2s ease; }
+    .nav-link:hover { background-color: var(--surface-color); color: var(--text-primary); }
+    .nav-link.active { background-color: var(--surface-color); color: var(--text-primary); box-shadow: inset 3px 0 0 0 var(--discord-blurple); }
+    .nav-link svg { width: 20px; height: 20px; }
+    .dashboard { position: relative; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; }
+    .dashboard::before { content: ''; position: absolute; top: 50%; left: 50%; width: 800px; height: 800px; background-image: radial-gradient(circle, rgba(88, 101, 242, 0.08), transparent 60%); transform: translate(-50%, -50%); pointer-events: none; z-index: 0; }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 2rem; border-bottom: 1px solid var(--border-color); background-color: rgba(10, 10, 10, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 10; }
+    .dashboard-header h1 { font-size: 1.75rem; font-weight: 600; }
+    .dashboard-content { padding: 2rem; position: relative; z-index: 1; display: grid; grid-template-columns: 1fr; gap: 1.5rem; max-width: 900px; width: 100%; margin: 0 auto;}
+    .card { background-color: rgba(20, 20, 20, 0.7); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); transition: all 0.3s ease; }
+    .card h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
+    
+    /* Settings specific */
+    .config-item, #license-info-container { display: flex; flex-direction: column; gap: 1.5rem; }
+    .license-item { display: flex; justify-content: space-between; align-items: center; }
+    .license-item h4 { color: var(--text-secondary); font-weight: 500; font-size: 0.9rem;}
+    .license-item p { font-weight: 600; }
+    .license-item p.status-active { color: var(--accent-positive); }
+    .license-item p.status-inactive { color: var(--accent-negative); }
+    .config-item:not(:last-child) { padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
+    .config-item h4 { color: var(--text-secondary); font-weight: 500; font-size: 0.9rem; margin-bottom: 0.25rem;}
+    .config-item p { font-weight: 600; }
+    .config-item p.description { font-weight: 400; font-size: 0.9rem; color: var(--text-secondary); margin-top: -1rem; margin-bottom: 0.5rem; }
+    .game-selection { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    .game-option { position: relative; }
+    .game-option input { display: none; }
+    .game-option label { display: flex; flex-direction: column; padding: 1.5rem; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
+    .game-option label:hover { border-color: var(--discord-blurple); background-color: rgba(88, 101, 242, 0.1); }
+    .game-option.disabled label { cursor: not-allowed; opacity: 0.5; }
+    .game-option.disabled label:hover { border-color: var(--border-color); background-color: var(--surface-color); }
+    .game-option input:checked + label { border-color: var(--discord-blurple); box-shadow: 0 0 15px rgba(88, 101, 242, 0.2); }
+    .game-name { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .game-status { font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); }
+    .game-option.active .game-status { color: var(--accent-positive); }
 
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-primary);
-            font-family: var(--font-main);
-            overflow-x: hidden;
-            background-image:
-                radial-gradient(circle at 15% 50%, rgba(88, 101, 242, 0.08), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.05), transparent 25%);
-            min-height: 100vh;
-        }
+    .primary-btn { font-family: 'Inter', sans-serif; background-color: var(--discord-blurple); color: var(--text-primary); border: none; padding: 0.75rem 1.5rem; font-size: 0.9rem; font-weight: 600; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 15px rgba(88, 101, 242, 0.2); text-decoration: none; }
+    .primary-btn:hover { background-color: #4752C4; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(88, 101, 242, 0.3); }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
+    .secondary-btn { 
+        font-family: 'Inter', sans-serif; 
+        background-color: var(--surface-color); 
+        color: var(--text-secondary); 
+        border: 1px solid var(--border-color); 
+        padding: 0.6rem 1.2rem; 
+        font-size: 0.9rem; 
+        font-weight: 600; 
+        border-radius: 6px; 
+        cursor: pointer; 
+        transition: all 0.2s ease; 
+    }
+    .secondary-btn:hover { 
+        background-color: var(--border-color); 
+        color: var(--text-primary); 
+    }
+    .license-item code {
+      background-color: var(--surface-color);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9em;
+    }
 
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #333;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #444;
-        }
-
-        /* Layout */
-        #app-container {
-            display: flex;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-        }
-
-        /* Sidebar - Glassy & Sleek */
-        .sidebar {
-            width: 260px;
-            background: rgba(10, 10, 10, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-right: 1px solid var(--border-glass);
-            padding: 2rem 1.5rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            flex-shrink: 0;
-            z-index: 50;
-        }
-
-        .logo {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 3rem;
-            text-shadow: 0 0 20px rgba(88, 101, 242, 0.5);
-            letter-spacing: 1px;
-        }
-
-        .logo span {
-            color: var(--accent-color);
-        }
-
-        .nav-links {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.85rem 1rem;
-            border-radius: 12px;
-            text-decoration: none;
-            color: var(--text-secondary);
-            font-weight: 500;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid transparent;
-        }
-
-        .nav-link:hover {
-            background: rgba(255, 255, 255, 0.03);
-            color: #fff;
-            transform: translateX(4px);
-        }
-
-        .nav-link.active {
-            background: rgba(88, 101, 242, 0.1);
-            color: #fff;
-            border-color: rgba(88, 101, 242, 0.2);
-            box-shadow: 0 0 15px rgba(88, 101, 242, 0.1);
-        }
-
-        .nav-link svg {
-            width: 20px;
-            height: 20px;
-            opacity: 0.8;
-        }
-
-        .nav-link.active svg {
-            opacity: 1;
-            color: var(--accent-color);
-        }
-
-        /* Main Content */
-        .dashboard {
-            flex-grow: 1;
-            overflow-y: auto;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 2rem 3rem;
-            position: sticky;
-            top: 0;
-            z-index: 40;
-            background: linear-gradient(to bottom, var(--bg-dark) 0%, rgba(5, 5, 5, 0) 100%);
-            backdrop-filter: blur(5px);
-        }
-
-        .dashboard-header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(to right, #fff, #a1a1aa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
-        }
-
-        .dashboard-content {
-            padding: 0 3rem 3rem 3rem;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
-            max-width: 1000px;
-            width: 100%;
-            margin: 0 auto;
-        }
-
-        /* Cards */
-        .card {
-            background: var(--surface-glass);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--border-glass);
-            border-radius: 16px;
-            padding: 2rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-glass);
-            color: #fff;
-        }
-
-        /* Settings Items */
-        .config-item,
-        #license-info-container {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .license-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .license-item h4 {
-            color: var(--text-secondary);
-            font-weight: 500;
-            font-size: 0.95rem;
-        }
-
-        .license-item p {
-            font-weight: 600;
-            color: #fff;
-        }
-
-        .license-item p.status-active {
-            color: var(--success);
-            text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
-        }
-
-        .license-item p.status-inactive {
-            color: var(--danger);
-        }
-
-        .config-item:not(:last-child) {
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border-glass);
-        }
-
-        .config-item h4 {
-            color: var(--text-secondary);
-            font-weight: 500;
-            font-size: 0.95rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .config-item p.description {
-            font-weight: 400;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-top: -0.5rem;
-            margin-bottom: 1rem;
-            line-height: 1.5;
-        }
-
-        /* Game Selection */
-        .game-selection {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1rem;
-        }
-
-        .game-option {
-            position: relative;
-        }
-
-        .game-option input {
-            display: none;
-        }
-
-        .game-option label {
-            display: flex;
-            flex-direction: column;
-            padding: 1.5rem;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-glass);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .game-option label:hover {
-            border-color: var(--accent-color);
-            background: rgba(88, 101, 242, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .game-option.disabled label {
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-
-        .game-option.disabled label:hover {
-            border-color: var(--border-glass);
-            background: rgba(255, 255, 255, 0.03);
-            transform: none;
-        }
-
-        .game-option input:checked+label {
-            border-color: var(--accent-color);
-            background: rgba(88, 101, 242, 0.15);
-            box-shadow: 0 0 20px rgba(88, 101, 242, 0.2);
-        }
-
-        .game-name {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: #fff;
-        }
-
-        .game-status {
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .game-option.active .game-status {
-            color: var(--success);
-        }
-
-        /* Buttons */
-        .primary-btn {
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(88, 101, 242, 0.3);
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .primary-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(88, 101, 242, 0.4);
-            background: var(--accent-hover);
-        }
-
-        .secondary-btn {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-secondary);
-            border: 1px solid var(--border-glass);
-            padding: 0.6rem 1.2rem;
-            border-radius: 10px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .secondary-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .license-item code {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 0.3rem 0.6rem;
-            border-radius: 6px;
-            font-family: var(--font-mono);
-            font-size: 0.85em;
-            color: var(--accent-color);
-            border: 1px solid var(--border-glass);
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            #app-container {
-                flex-direction: column;
-                height: auto;
-                overflow: auto;
-            }
-
-            .sidebar {
-                width: 100%;
-                height: auto;
-                padding: 1rem;
-                flex-direction: row;
-                align-items: center;
-                position: sticky;
-                top: 0;
-            }
-
-            .nav-links {
-                flex-direction: row;
-                overflow-x: auto;
-            }
-
-            .dashboard-content {
-                padding: 1.5rem;
-            }
-
-            .dashboard-header {
-                padding: 1.5rem;
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
-            }
-        }
-    </style>
+    /* Responsive */
+    @media (max-width: 768px) {
+      #app-container { flex-direction: column; position: relative; height: auto; }
+      .sidebar { width: 100%; height: auto; flex-direction: row; align-items: center; padding: 1rem; border-right: none; border-bottom: 1px solid var(--border-color); }
+      .sidebar > div { display: flex; align-items: center; gap: 1rem; }
+      .sidebar .logo { margin-bottom: 0; }
+      .nav-links { flex-direction: row; gap: 0.25rem; flex-grow: 0; }
+      .nav-link { padding: 0.5rem; }
+      .nav-link.active { box-shadow: inset 0 -2px 0 0 var(--discord-blurple); }
+      .nav-link svg { display: block; } .nav-link span { display: none; }
+      #logout-btn { margin-top: 0; }
+      .dashboard-header { padding: 1rem; }
+      .dashboard-header h1 { font-size: 1.25rem; }
+      .dashboard-content { padding: 1rem; }
+    }
+  </style>
 </head>
-
 <body>
-    <div id="app-container">
-        <nav class="sidebar">
-            <div>
-                <div class="logo">
-                    &lt;<span>/</span>async&gt;
+  <div id="app-container">
+    <nav class="sidebar">
+      <div>
+        <div class="logo">
+          &lt;<span>/</span>async&gt;
+        </div>
+        <ul class="nav-links">
+          <li><a href="/dashboard.html" class="nav-link" data-page="dashboard">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            <span>Dashboard</span>
+          </a></li>
+          <li><a href="/scans.html" class="nav-link" data-page="scans">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+            <span>Scans</span>
+          </a></li>
+          <li><a href="/results.html" class="nav-link" data-page="results">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            <span>Results</span>
+          </a></li>
+          <li><a href="/settings.html" class="nav-link active" data-page="settings">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+            <span>Settings</span>
+          </a></li>
+          <li><a href="/rules.html" class="nav-link" data-page="rules">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+            <span>Rules</span>
+          </a></li>
+          <li id="enterprise-nav-link-container" class="hidden"><a href="/enterprise.html" class="nav-link" data-page="enterprise">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6"/><path d="M23 11h-6"/></svg>
+            <span>Enterprise</span>
+          </a></li>
+          <li id="admin-nav-link-container" class="hidden"><a href="/admin.html" class="nav-link" data-page="admin">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path><path d="M12 15c-2.2 0-4 1.8-4 4v1h8v-1c0-2.2-1.8-4-4-4z"></path></svg>
+            <span>Admin</span>
+          </a></li>
+        </ul>
+      </div>
+      <a href="/logout" id="logout-btn" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+        <span>Logout</span>
+      </a>
+    </nav>
+    <main class="dashboard">
+      <header class="dashboard-header">
+        <h1 id="dashboard-title">Settings</h1>
+      </header>
+      <section class="dashboard-content">
+          <div class="settings-wrapper">
+            <div class="card">
+                <h3>License Information</h3>
+                <div id="license-info-container">
+                    <p>Loading license status...</p>
                 </div>
-                <ul class="nav-links">
-                    <li><a href="/dashboard.html" class="nav-link" data-page="dashboard">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <rect x="3" y="3" width="7" height="7"></rect>
-                                <rect x="14" y="3" width="7" height="7"></rect>
-                                <rect x="14" y="14" width="7" height="7"></rect>
-                                <rect x="3" y="14" width="7" height="7"></rect>
-                            </svg>
-                            <span>Dashboard</span>
-                        </a></li>
-                    <li><a href="/scans.html" class="nav-link" data-page="scans">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <circle cx="12" cy="12" r="6"></circle>
-                                <circle cx="12" cy="12" r="2"></circle>
-                            </svg>
-                            <span>Scans</span>
-                        </a></li>
-                    <li><a href="/results.html" class="nav-link" data-page="results">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                <polyline points="14 2 14 8 20 8"></polyline>
-                                <line x1="16" y1="13" x2="8" y2="13"></line>
-                                <line x1="16" y1="17" x2="8" y2="17"></line>
-                                <polyline points="10 9 9 9 8 9"></polyline>
-                            </svg>
-                            <span>Results</span>
-                        </a></li>
-                    <li><a href="/settings.html" class="nav-link active" data-page="settings">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <line x1="4" y1="21" x2="4" y2="14"></line>
-                                <line x1="4" y1="10" x2="4" y2="3"></line>
-                                <line x1="12" y1="21" x2="12" y2="12"></line>
-                                <line x1="12" y1="8" x2="12" y2="3"></line>
-                                <line x1="20" y1="21" x2="20" y2="16"></line>
-                                <line x1="20" y1="12" x2="20" y2="3"></line>
-                                <line x1="1" y1="14" x2="7" y2="14"></line>
-                                <line x1="9" y1="8" x2="15" y2="8"></line>
-                                <line x1="17" y1="16" x2="23" y2="16"></line>
-                            </svg>
-                            <span>Settings</span>
-                        </a></li>
-                    <li><a href="/rules.html" class="nav-link" data-page="rules">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <line x1="8" y1="6" x2="21" y2="6"></line>
-                                <line x1="8" y1="12" x2="21" y2="12"></line>
-                                <line x1="8" y1="18" x2="21" y2="18"></line>
-                                <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                                <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                                <line x1="3" y1="18" x2="3.01" y2="18"></line>
-                            </svg>
-                            <span>Rules</span>
-                        </a></li>
-                    <li id="enterprise-nav-link-container" class="hidden"><a href="/enterprise.html" class="nav-link"
-                            data-page="enterprise">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                                <circle cx="8.5" cy="7" r="4" />
-                                <path d="M20 8v6" />
-                                <path d="M23 11h-6" />
-                            </svg>
-                            <span>Enterprise</span>
-                        </a></li>
-                    <li id="admin-nav-link-container" class="hidden"><a href="/admin.html" class="nav-link"
-                            data-page="admin">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                                <path d="M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
-                                <path d="M12 15c-2.2 0-4 1.8-4 4v1h8v-1c0-2.2-1.8-4-4-4z"></path>
-                            </svg>
-                            <span>Admin</span>
-                        </a></li>
-                </ul>
             </div>
-            <a href="/logout" id="logout-btn" class="nav-link">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                    <polyline points="16 17 21 12 16 7" />
-                    <line x1="21" x2="9" y1="12" y2="12" />
-                </svg>
-                <span>Logout</span>
-            </a>
-        </nav>
-        <main class="dashboard">
-            <header class="dashboard-header">
-                <h1 id="dashboard-title">Settings</h1>
-            </header>
-            <section class="dashboard-content">
-                <div class="settings-wrapper" style="display: contents;">
-                    <div class="card">
-                        <h3>License Information</h3>
-                        <div id="license-info-container">
-                            <p>Loading license status...</p>
+             <div class="card">
+                <h3>API & System Status</h3>
+                <div id="api-status-container">
+                    <p>Loading status...</p>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Scanner Configuration</h3>
+                <div class="config-item">
+                    <h4>Target Game</h4>
+                    <p class="description">Select the game you intend to scan. Support for additional games is coming soon.</p>
+                    <div class="game-selection">
+                        <div class="game-option">
+                            <input type="radio" id="game-fivem" name="game" value="fivem" checked>
+                            <label for="game-fivem">
+                                <span class="game-name">FiveM</span>
+                                <span class="game-status">Active</span>
+                            </label>
                         </div>
-                    </div>
-                    <div class="card">
-                        <h3>API & System Status</h3>
-                        <div id="api-status-container">
-                            <p>Loading status...</p>
+                        <div class="game-option disabled">
+                            <input type="radio" id="game-minecraft" name="game" value="minecraft" disabled>
+                            <label for="game-minecraft">
+                                <span class="game-name">Minecraft</span>
+                                <span class="game-status">Coming Soon</span>
+                            </label>
                         </div>
-                    </div>
-                    <div class="card">
-                        <h3>Scanner Configuration</h3>
-                        <div class="config-item">
-                            <h4>Target Game</h4>
-                            <p class="description">Select the game you intend to scan. Support for additional games is
-                                coming soon.</p>
-                            <div class="game-selection">
-                                <div class="game-option">
-                                    <input type="radio" id="game-fivem" name="game" value="fivem" checked>
-                                    <label for="game-fivem">
-                                        <span class="game-name">FiveM</span>
-                                        <span class="game-status">Active</span>
-                                    </label>
-                                </div>
-                                <div class="game-option disabled">
-                                    <input type="radio" id="game-minecraft" name="game" value="minecraft" disabled>
-                                    <label for="game-minecraft">
-                                        <span class="game-name">Minecraft</span>
-                                        <span class="game-status">Coming Soon</span>
-                                    </label>
-                                </div>
-                                <div class="game-option disabled">
-                                    <input type="radio" id="game-dayz" name="game" value="dayz" disabled>
-                                    <label for="game-dayz">
-                                        <span class="game-name">DayZ</span>
-                                        <span class="game-status">Coming Soon</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <h3>Custom Detections</h3>
-                        <div class="config-item">
-                            <h4>Detection Rules</h4>
-                            <p class="description">Manage your own custom YARA rules, keywords, and file hashes to
-                                tailor the scanner's detection capabilities to your community's specific needs.</p>
-                            <a href="/rules.html" class="primary-btn" style="align-self: flex-start;">Manage Rules</a>
+                        <div class="game-option disabled">
+                            <input type="radio" id="game-dayz" name="game" value="dayz" disabled>
+                            <label for="game-dayz">
+                                <span class="game-name">DayZ</span>
+                                <span class="game-status">Coming Soon</span>
+                            </label>
                         </div>
                     </div>
                 </div>
-            </section>
-        </main>
-    </div>
-    <script type="module">
-        let currentUser = null;
+            </div>
+            <div class="card">
+                <h3>Custom Detections</h3>
+                <div class="config-item">
+                    <h4>Detection Rules</h4>
+                    <p class="description">Manage your own custom YARA rules, keywords, and file hashes to tailor the scanner's detection capabilities to your community's specific needs.</p>
+                    <a href="/rules.html" class="primary-btn" style="align-self: flex-start;">Manage Rules</a>
+                </div>
+            </div>
+          </div>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    let currentUser = null;
 
-        function applyCachedAuth() {
-            try {
-                const cachedUser = sessionStorage.getItem('currentUser');
-                if (cachedUser) {
-                    const user = JSON.parse(cachedUser);
-                    if (user.role === 'admin') {
-                        document.getElementById('admin-nav-link-container').classList.remove('hidden');
-                    }
-                    if (user.is_enterprise_admin) {
-                        document.getElementById('enterprise-nav-link-container').classList.remove('hidden');
-                    }
+    function applyCachedAuth() {
+        try {
+            const cachedUser = sessionStorage.getItem('currentUser');
+            if (cachedUser) {
+                const user = JSON.parse(cachedUser);
+                if (user.role === 'admin') {
+                    document.getElementById('admin-nav-link-container').classList.remove('hidden');
                 }
-            } catch (e) {
-                console.warn('Could not apply cached auth state.', e);
-                sessionStorage.removeItem('currentUser');
+                if (user.is_enterprise_admin) {
+                    document.getElementById('enterprise-nav-link-container').classList.remove('hidden');
+                }
             }
+        } catch (e) {
+            console.warn('Could not apply cached auth state.', e);
+            sessionStorage.removeItem('currentUser');
         }
+    }
 
-        async function checkAuth() {
-            try {
-                const response = await fetch('/api/user');
-                if (!response.ok) {
-                    window.location.href = '/index.html';
-                    return null;
-                }
-                const userData = await response.json();
-                sessionStorage.setItem('currentUser', JSON.stringify(userData));
-                if (userData.is_banned || !userData.has_license) {
-                    window.location.href = '/unlicensed.html';
-                    return null;
-                }
-                currentUser = userData;
-                return userData;
-            } catch (error) {
-                console.error("Auth check failed:", error);
+    async function checkAuth() {
+        try {
+            const response = await fetch('/api/user');
+            if (!response.ok) {
                 window.location.href = '/index.html';
                 return null;
             }
+            const userData = await response.json();
+            sessionStorage.setItem('currentUser', JSON.stringify(userData));
+            if (userData.is_banned || !userData.has_license) {
+                window.location.href = '/unlicensed.html';
+                return null;
+            }
+            currentUser = userData;
+            return userData;
+        } catch (error) {
+            console.error("Auth check failed:", error);
+            window.location.href = '/index.html';
+            return null;
+        }
+    }
+
+    function setupSharedLayout(user) {
+        if (user && user.role === 'admin') {
+            document.getElementById('admin-nav-link-container').classList.remove('hidden');
+        }
+        if (user && user.is_enterprise_admin) {
+            document.getElementById('enterprise-nav-link-container').classList.remove('hidden');
+        }
+        document.getElementById('logout-btn').addEventListener('click', e => {
+            e.preventDefault();
+            window.location.href = '/logout';
+        });
+    }
+
+    async function fetchAndRenderApiStatus(user) {
+        const container = document.getElementById('api-status-container');
+        if (!container) return;
+        
+        container.innerHTML = `<div class="license-item"><h4>API Status</h4><p>Pinging...</p></div>`;
+
+        const startTime = performance.now();
+        let status = 'Unreachable';
+        let latency = 'N/A';
+        let statusClass = 'status-inactive';
+
+        try {
+            const response = await fetch(`/api/ping?t=${Date.now()}`);
+            const endTime = performance.now();
+            if (response.ok) {
+                status = 'Operational';
+                latency = `${Math.round(endTime - startTime)} ms`;
+                statusClass = 'status-active';
+            }
+        } catch (error) {
+            console.error("API ping failed:", error);
         }
 
-        function setupSharedLayout(user) {
-            if (user && user.role === 'admin') {
-                document.getElementById('admin-nav-link-container').classList.remove('hidden');
-            }
-            if (user && user.is_enterprise_admin) {
-                document.getElementById('enterprise-nav-link-container').classList.remove('hidden');
-            }
-            document.getElementById('logout-btn').addEventListener('click', e => {
-                e.preventDefault();
-                window.location.href = '/logout';
-            });
-        }
-
-        async function fetchAndRenderApiStatus(user) {
-            const container = document.getElementById('api-status-container');
-            if (!container) return;
-
-            container.innerHTML = `<div class="license-item"><h4>API Status</h4><p>Pinging...</p></div>`;
-
-            const startTime = performance.now();
-            let status = 'Unreachable';
-            let latency = 'N/A';
-            let statusClass = 'status-inactive';
-
-            try {
-                const response = await fetch(`/api/ping?t=${Date.now()}`);
-                const endTime = performance.now();
-                if (response.ok) {
-                    status = 'Operational';
-                    latency = `${Math.round(endTime - startTime)} ms`;
-                    statusClass = 'status-active';
-                }
-            } catch (error) {
-                console.error("API ping failed:", error);
-            }
-
-            container.innerHTML = `
+        container.innerHTML = `
             <div class="config-item" style="padding-bottom: 0; border: none;">
                 <div class="license-item">
                     <h4>API Status</h4>
@@ -694,43 +332,43 @@
                 <button id="refresh-status-btn" class="secondary-btn">Refresh</button>
             </div>
         `;
-
-            const refreshBtn = document.getElementById('refresh-status-btn');
-            if (refreshBtn) {
-                refreshBtn.addEventListener('click', () => {
-                    refreshBtn.textContent = 'Refreshing...';
-                    refreshBtn.disabled = true;
-                    fetchAndRenderApiStatus(user).finally(() => {
-                        refreshBtn.textContent = 'Refresh';
-                        refreshBtn.disabled = false;
-                    });
+        
+        const refreshBtn = document.getElementById('refresh-status-btn');
+        if(refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                refreshBtn.textContent = 'Refreshing...';
+                refreshBtn.disabled = true;
+                fetchAndRenderApiStatus(user).finally(() => {
+                    refreshBtn.textContent = 'Refresh';
+                    refreshBtn.disabled = false;
                 });
-            }
+            });
         }
+    }
 
-        function renderLicenseInfo(user) {
-            const container = document.getElementById('license-info-container');
-            if (!container) return;
+    function renderLicenseInfo(user) {
+      const container = document.getElementById('license-info-container');
+      if (!container) return;
 
-            let expirationText = '';
-            if (user.license_expires_at) {
-                const expirationDate = new Date(user.license_expires_at);
-                const now = new Date();
-                const diffTime = expirationDate - now;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      let expirationText = '';
+      if (user.license_expires_at) {
+          const expirationDate = new Date(user.license_expires_at);
+          const now = new Date();
+          const diffTime = expirationDate - now;
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          
+          if (diffTime < 0) {
+              expirationText = `Expired on ${expirationDate.toLocaleDateString()}`;
+          } else {
+              expirationText = `Expires in ${diffDays} day${diffDays !== 1 ? 's' : ''} (on ${expirationDate.toLocaleDateString()})`;
+          }
+      } else if (user.role === 'admin' || user.is_enterprise_admin) {
+           expirationText = 'Never (Admin/Enterprise)';
+      } else {
+           expirationText = 'Never (Lifetime)';
+      }
 
-                if (diffTime < 0) {
-                    expirationText = `Expired on ${expirationDate.toLocaleDateString()}`;
-                } else {
-                    expirationText = `Expires in ${diffDays} day${diffDays !== 1 ? 's' : ''} (on ${expirationDate.toLocaleDateString()})`;
-                }
-            } else if (user.role === 'admin' || user.is_enterprise_admin) {
-                expirationText = 'Never (Admin/Enterprise)';
-            } else {
-                expirationText = 'Never (Lifetime)';
-            }
-
-            container.innerHTML = `
+      container.innerHTML = `
           <div class="license-item">
               <h4>Status</h4>
               <p class="status-active">Active</p>
@@ -740,53 +378,52 @@
               <p>${expirationText}</p>
           </div>
       `;
-        }
+    }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            applyCachedAuth();
-            const user = await checkAuth();
-            if (user) {
-                setupSharedLayout(user);
-                renderLicenseInfo(user);
-                fetchAndRenderApiStatus(user);
+    document.addEventListener('DOMContentLoaded', async () => {
+        applyCachedAuth();
+        const user = await checkAuth();
+        if (user) {
+            setupSharedLayout(user);
+            renderLicenseInfo(user);
+            fetchAndRenderApiStatus(user);
 
-                // --- Game Selection Logic ---
-                const gameRadios = document.querySelectorAll('input[name="game"]');
-                const gameOptions = document.querySelectorAll('.game-option');
-                const savedGame = localStorage.getItem('selectedGame');
+            // --- Game Selection Logic ---
+            const gameRadios = document.querySelectorAll('input[name="game"]');
+            const gameOptions = document.querySelectorAll('.game-option');
+            const savedGame = localStorage.getItem('selectedGame');
 
-                // Function to sync the 'active' class with the checked radio button
-                const syncActiveGameVisual = () => {
-                    let checkedRadio = document.querySelector('input[name="game"]:checked');
-                    gameOptions.forEach(option => {
-                        const input = option.querySelector('input[name="game"]');
-                        option.classList.toggle('active', input === checkedRadio);
-                    });
-                };
-
-                // On load, check localStorage and update the checked radio
-                if (savedGame) {
-                    const radioToSelect = document.querySelector(`input[value="${savedGame}"]`);
-                    if (radioToSelect && !radioToSelect.disabled) {
-                        radioToSelect.checked = true;
-                    }
-                }
-
-                // Set the initial visual state
-                syncActiveGameVisual();
-
-                // Add listeners for any future changes
-                gameRadios.forEach(radio => {
-                    radio.addEventListener('change', (e) => {
-                        if (e.target.checked) {
-                            localStorage.setItem('selectedGame', e.target.value);
-                            syncActiveGameVisual();
-                        }
-                    });
+            // Function to sync the 'active' class with the checked radio button
+            const syncActiveGameVisual = () => {
+                let checkedRadio = document.querySelector('input[name="game"]:checked');
+                gameOptions.forEach(option => {
+                    const input = option.querySelector('input[name="game"]');
+                    option.classList.toggle('active', input === checkedRadio);
                 });
+            };
+            
+            // On load, check localStorage and update the checked radio
+            if (savedGame) {
+                const radioToSelect = document.querySelector(`input[value="${savedGame}"]`);
+                if (radioToSelect && !radioToSelect.disabled) {
+                    radioToSelect.checked = true;
+                }
             }
-        });
-    </script>
-</body>
 
+            // Set the initial visual state
+            syncActiveGameVisual();
+
+            // Add listeners for any future changes
+            gameRadios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        localStorage.setItem('selectedGame', e.target.value);
+                        syncActiveGameVisual();
+                    }
+                });
+            });
+        }
+    });
+  </script>
+</body>
 </html>
