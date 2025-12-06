@@ -1,0 +1,387 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>&lt;/async&gt;</title>
+  <script src="security.js"></script>
+  <script src="notifications.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@300;400;500;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --background-color: #0a0a0a;
+      --accent-color: #ffffff;
+      --text-primary: #f0f0f0;
+      --text-secondary: #888;
+      --border-color: #333;
+      --box-bg-color: #111111;
+      --success-color: #4CAF50;
+      --danger-color: #F44336;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    html {
+        cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'/%3E%3C/svg%3E") 4 4, auto;
+    }
+
+    html.cursor-active {
+        cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='rgba(255,255,255,0.3)' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'/%3E%3C/svg%3E") 4 4, auto !important;
+    }
+    
+    button { cursor: inherit !important; }
+
+    html, body { background-color: transparent; }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      color: var(--text-primary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    }
+
+    .scanner-box {
+      border: 1px solid var(--border-color);
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background-color: var(--box-bg-color);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .bg-animation {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 1;
+        pointer-events: none;
+    }
+    @keyframes float-symbol {
+        0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+        25% { opacity: 0.4; }
+        50% { transform: translateY(-100px) rotate(180deg); }
+        75% { opacity: 0.4; }
+        100% { transform: translateY(0) rotate(360deg); opacity: 0; }
+    }
+    .bg-animation .symbol {
+        position: absolute;
+        color: var(--border-color);
+        font-family: 'Orbitron', monospace;
+        font-weight: 700;
+        user-select: none;
+        animation-name: float-symbol;
+        animation-timing-function: ease-in-out;
+        animation-iteration-count: infinite;
+    }
+
+    .scanner-box-inner {
+        flex-grow: 1;
+        padding: 20px;
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+    
+    .scanning-container, .initial-container, .complete-container, .pin-entry-view {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.98); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    .initial-container, .scanning-container, .complete-container, .pin-entry-view { animation: fadeIn 0.5s ease-out; }
+
+    .initial-icon-wrapper { margin-bottom: 15px; }
+    .aether-logo { width: 60px; height: 60px; }
+    .aether-logo polyline, .aether-logo line { stroke: var(--accent-color); stroke-width: 10; }
+
+    .scan-button {
+        background-color: var(--box-bg-color);
+        color: var(--accent-color);
+        border: 1px solid var(--accent-color);
+        padding: 10px 24px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.2s ease;
+        width: 220px;
+        margin-top: 25px;
+    }
+    .scan-button:hover:not(:disabled) {
+        background-color: var(--accent-color);
+        color: var(--box-bg-color);
+    }
+
+    h2 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.3rem;
+        font-weight: 500;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--text-primary);
+    }
+
+    .progress-bar-container { width: 100%; max-width: 350px; height: 4px; background-color: #222; margin-bottom: 10px; overflow: hidden; }
+    .progress-bar { height: 100%; background-color: var(--accent-color); transition: width 0.5s ease-in-out; }
+    .status-text { color: var(--text-secondary); font-family: 'Courier New', Courier, monospace; min-height: 18px; margin-bottom: 6px; font-size: 0.85rem; text-align: center; }
+    .progress-percentage { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--accent-color); }
+
+    .results-subtitle { color: var(--text-secondary); max-width: 380px; font-size: 0.9rem; }
+    
+    .complete-container h2 { font-size: 1.3rem; }
+    .complete-symbol {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--accent-color);
+        margin-bottom: 15px;
+    }
+
+    footer { flex-shrink: 0; padding: 6px 0; font-size: 0.6rem; font-family: 'Orbitron', sans-serif; color: var(--text-secondary); opacity: 0.5; text-align: center; position: relative; z-index: 2; border-top: 1px solid var(--border-color); }
+
+    .pin-entry-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 280px;
+      margin-top: 25px;
+    }
+    .pin-entry-prompt { font-size: 0.85rem; color: var(--text-secondary); margin: 0; }
+    .pin-entry-input { width: 100%; padding: 10px 16px; background: #2a2a2a; border: 1px solid #444; color: #fff; font-family: 'Orbitron', monospace; font-size: 1.2rem; text-align: center; letter-spacing: 4px; transition: all 0.2s ease; outline: none; }
+    .pin-entry-input:focus { border-color: var(--accent-color); box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2); }
+    .pin-entry-input::placeholder { color: #666; }
+    .pin-entry-error { color: #ff4444; font-family: 'Roboto', sans-serif; font-size: 0.8rem; margin-top: -4px; min-height: 1em; }
+    .pin-entry-actions { display: flex; gap: 10px; width: 100%; }
+    .pin-entry-cancel-btn, .pin-entry-submit-btn { flex-grow: 1; padding: 8px 16px; font-size: 0.8rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.2s ease; background: transparent; }
+    .pin-entry-cancel-btn { color: #ccc; border: 1px solid #444; }
+    .pin-entry-cancel-btn:hover { background: #333; color: #fff; }
+    .pin-entry-submit-btn { color: #fff; border: 1px solid var(--accent-color); }
+    .pin-entry-submit-btn:hover:not(:disabled) { background: var(--accent-color); color: #111; }
+    .pin-entry-submit-btn:disabled { background: #333; color: #666; cursor: not-allowed; border-color: #333; }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <main class="scanner-box">
+      <div class="bg-animation"></div>
+      <div id="app-content" class="scanner-box-inner">
+        <!-- JS will render content here -->
+      </div>
+      <footer>
+        <p>&lt;/async&gt; v1 (Fivem Engine Edition)</p>
+      </footer>
+    </main>
+  </div>
+
+  <template id="initial-view">
+    <div class="initial-container">
+      <div class="initial-icon-wrapper">
+        <svg class="aether-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <polyline fill="none" points="35,20 10,50 35,80" />
+          <line fill="none" x1="45" y1="80" x2="55" y2="20" />
+          <polyline fill="none" points="65,20 90,50 65,80" />
+        </svg>
+      </div>
+      <h2>&lt;/async&gt;</h2>
+      <button id="initiate-scan-btn" class="scan-button">INITIATE SCAN</button>
+    </div>
+  </template>
+
+  <template id="pin-entry-view">
+    <div class="pin-entry-view">
+      <div class="initial-icon-wrapper">
+        <svg class="aether-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <polyline fill="none" points="35,20 10,50 35,80" />
+          <line fill="none" x1="45" y1="80" x2="55" y2="20" />
+          <polyline fill="none" points="65,20 90,50 65,80" />
+        </svg>
+      </div>
+      <h2>&lt;/async&gt;</h2>
+      <div class="pin-entry-container">
+        <p class="pin-entry-prompt">Enter the 6-digit PIN to begin.</p>
+        <input type="text" id="pin-input" class="pin-entry-input" placeholder="000000" maxlength="6" autofocus />
+        <div id="pin-error" class="pin-entry-error"></div>
+        <div class="pin-entry-actions">
+          <button id="pin-cancel-btn" class="pin-entry-cancel-btn">Cancel</button>
+          <button id="pin-submit-btn" class="pin-entry-submit-btn" disabled>Start Scan</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="scanning-view">
+    <div class="scanning-container">
+      <h2>ANALYZING SYSTEM INTEGRITY</h2>
+      <div class="progress-bar-container">
+        <div id="progress-bar" class="progress-bar" style="width: 0%;"></div>
+      </div>
+      <p id="status-text" class="status-text" aria-live="polite"></p>
+      <p id="progress-percentage" class="progress-percentage">0%</p>
+    </div>
+  </template>
+  
+  <template id="complete-view">
+    <div class="complete-container">
+      <div class="complete-symbol">&lt;/&gt;</div>
+      <h2>SCAN COMPLETE</h2>
+      <p class="results-subtitle">The forensic report has been successfully submitted. You may now close this application.</p>
+    </div>
+  </template>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const appContent = document.getElementById('app-content');
+        const templates = {
+            initial: document.getElementById('initial-view'),
+            pinEntry: document.getElementById('pin-entry-view'),
+            scanning: document.getElementById('scanning-view'),
+            complete: document.getElementById('complete-view'),
+        };
+
+        const renderView = (viewName) => {
+            appContent.innerHTML = '';
+            const template = templates[viewName];
+            if (template) {
+                appContent.appendChild(template.content.cloneNode(true));
+                bindEventListeners(viewName);
+            }
+        };
+        
+        const startScanSimulation = () => {
+            const statuses = [
+                { p: 10, s: 'ANALYZING SYSTEM PROCESSES...' },
+                { p: 30, s: 'SCANNING MEMORY REGIONS...' },
+                { p: 60, s: 'VERIFYING FILE SYSTEM INTEGRITY...' },
+                { p: 85, s: 'CHECKING NETWORK CONNECTIONS...' },
+                { p: 95, s: 'COMPILING FORENSIC REPORT...' },
+                { p: 100, s: 'SUBMITTING REPORT...' },
+            ];
+            
+            let statusIndex = 0;
+            
+            const progressBar = document.getElementById('progress-bar');
+            const statusText = document.getElementById('status-text');
+            const progressPercentage = document.getElementById('progress-percentage');
+            
+            const progressInterval = setInterval(() => {
+                if (statusIndex < statuses.length && progressBar && statusText && progressPercentage) {
+                    const current = statuses[statusIndex];
+                    progressBar.style.width = `${current.p}%`;
+                    statusText.textContent = current.s;
+                    progressPercentage.textContent = `${current.p}%`;
+                    statusIndex++;
+                } else {
+                    clearInterval(progressInterval);
+                    if (window.parent) {
+                        window.parent.postMessage('scanComplete', window.location.origin);
+                    }
+                    setTimeout(() => renderView('complete'), 500);
+                }
+            }, 1000);
+        };
+
+        const bindEventListeners = (viewName) => {
+            if (viewName === 'initial') {
+                document.getElementById('initiate-scan-btn').addEventListener('click', () => renderView('pinEntry'));
+            } else if (viewName === 'pinEntry') {
+                const pinInput = document.getElementById('pin-input');
+                const submitBtn = document.getElementById('pin-submit-btn');
+                const errorEl = document.getElementById('pin-error');
+
+                document.getElementById('pin-cancel-btn').addEventListener('click', () => renderView('initial'));
+                submitBtn.addEventListener('click', () => {
+                    if (pinInput.value.length === 6) {
+                        renderView('scanning');
+                    } else {
+                        errorEl.textContent = 'PIN must be exactly 6 digits.';
+                    }
+                });
+
+                pinInput.addEventListener('input', () => {
+                    pinInput.value = pinInput.value.replace(/\D/g, '').slice(0, 6);
+                    submitBtn.disabled = pinInput.value.length !== 6;
+                    if (pinInput.value.length === 6) {
+                        errorEl.textContent = '';
+                    }
+                });
+                pinInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !submitBtn.disabled) {
+                        e.preventDefault();
+                        renderView('scanning');
+                    }
+                });
+            } else if (viewName === 'scanning') {
+                startScanSimulation();
+            }
+        };
+        
+        const setupBackground = () => {
+          const bgContainer = document.querySelector('.bg-animation');
+          if (!bgContainer) return;
+          const symbols = Array.from({ length: 15 }).map(() => {
+              const span = document.createElement('span');
+              span.className = 'symbol';
+              span.innerHTML = '&lt;/&gt;';
+              span.style.top = `${Math.random() * 80 + 10}%`;
+              span.style.left = `${Math.random() * 80 + 10}%`;
+              span.style.fontSize = `${Math.random() * 10 + 10}px`;
+              span.style.animationDuration = `${Math.random() * 15 + 10}s`;
+              span.style.animationDelay = `${Math.random() * -10}s`;
+              return span;
+          });
+          bgContainer.append(...symbols);
+        };
+
+        // Initial setup
+        setupBackground();
+        renderView('initial');
+        
+        // Cursor effect
+        document.addEventListener('mousedown', () => document.documentElement.classList.add('cursor-active'));
+        document.addEventListener('mouseup', () => document.documentElement.classList.remove('cursor-active'));
+    });
+  </script>
+</body>
+
+</html>

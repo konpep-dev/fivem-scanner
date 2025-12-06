@@ -1,0 +1,2075 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report | </async> Scanner</title>
+    <script src="security.js"></script>
+    <script src="notifications.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --background-color: #0A0A0A;
+            --sidebar-bg: #000000;
+            --surface-color: #141414;
+            --border-color: #2A2A2A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+            --accent-positive: #10B981;
+            --accent-negative: #EF4444;
+            --accent-warning: #F59E0B;
+            --discord-blurple: #5865F2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            background-color: transparent;
+        }
+        
+        #true-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            z-index: -3;
+        }
+        
+        #background-glow {
+            content: '';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 200vw;
+            height: 200vh;
+            max-width: 2500px;
+            max-height: 2500px;
+            background-image: radial-gradient(circle, rgba(88, 101, 242, 0.25), transparent 50%);
+            transform: translate(-50%, -50%);
+            animation: pulse 8s infinite ease-in-out;
+            z-index: -2;
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.7; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.7; }
+        }
+
+        #background-animations {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .floating-symbol {
+            position: absolute;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7), 0 0 20px rgba(255, 255, 0.5);
+            opacity: 0.1;
+            user-select: none;
+            animation: float infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(20px, 40px) rotate(15deg); }
+            50% { transform: translate(-30px, -10px) rotate(-5deg); }
+            75% { transform: translate(10px, -50px) rotate(10deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--background-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 5px;
+            border: 2px solid var(--background-color);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--text-secondary);
+        }
+
+        /* App Layout */
+        #app-container {
+             background-color: var(--background-color);
+        }
+
+        .dashboard {
+            position: relative;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-bottom: 4rem;
+        }
+
+        .dashboard-content {
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .dashboard::before {
+            content: '';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 800px;
+            height: 800px;
+            background-image: radial-gradient(circle, rgba(88, 101, 242, 0.08), transparent 60%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background-color: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            gap: 1.5rem;
+        }
+
+        #dashboard-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            flex-grow: 1;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .back-btn:hover {
+            color: var(--text-primary);
+        }
+
+        #header-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background-color: rgba(20, 20, 20, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: all 0.3s ease;
+        }
+
+        /* Report Page specific styles */
+        .report-hero {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 2.5rem;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(30, 30, 30, 0.7));
+            padding: 2.5rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .risk-gauge { position: relative; width: 180px; height: 180px; }
+        .risk-gauge svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .gauge-track { fill: none; stroke: var(--border-color); stroke-width: 14; }
+        .gauge-value { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset 1.5s cubic-bezier(0.25, 1, 0.5, 1), stroke 0.5s; }
+        .gauge-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .gauge-score { font-family: 'Orbitron', sans-serif; font-size: 3rem; font-weight: 700; line-height: 1; }
+        .gauge-label { font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .hero-summary .summary-title { font-size: 2rem; font-weight: 600; margin-bottom: 0.75rem; }
+        .hero-summary .summary-subtitle { font-size: 1.1rem; color: var(--text-secondary); max-width: 400px; line-height: 1.6; margin-bottom: 1.5rem; }
+        .summary-breakdown { display: flex; gap: 1.5rem; }
+        .breakdown-item { display: flex; align-items: center; gap: 0.5rem; }
+        .breakdown-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .breakdown-dot.critical { background-color: var(--accent-negative); }
+        .breakdown-dot.high { background-color: #f97316; }
+        .breakdown-dot.medium { background-color: var(--accent-warning); }
+        .breakdown-count { font-weight: 600; font-size: 1.25rem; }
+        .breakdown-label { color: var(--text-secondary); font-size: 0.9rem; }
+        
+        .report-layout { display: grid; grid-template-columns: 1fr 320px; gap: 2rem; align-items: start; }
+        .main-content { display: flex; flex-direction: column; gap: 2rem; }
+        .sidebar-content { position: sticky; top: 100px; display: flex; flex-direction: column; gap: 1.5rem; }
+
+        .report-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .action-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .danger-btn {
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .danger-btn:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--accent-negative);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 38px;
+            height: 22px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            transition: .4s;
+            border-radius: 22px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--text-secondary);
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--discord-blurple);
+            border-color: var(--discord-blurple);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(16px);
+            background-color: white;
+        }
+
+        .risk-none {
+            color: var(--accent-positive) !important;
+        }
+
+        .risk-medium {
+            color: var(--accent-warning) !important;
+        }
+
+        .risk-high {
+            color: #f97316 !important;
+        }
+
+        .risk-critical {
+            color: var(--accent-negative) !important;
+        }
+        
+        .stroke-none { stroke: var(--accent-positive); }
+        .stroke-low { stroke: var(--accent-positive); }
+        .stroke-medium { stroke: var(--accent-warning); }
+        .stroke-high { stroke: #f97316; }
+        .stroke-critical { stroke: var(--accent-negative); }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .section-title svg {
+            color: var(--discord-blurple);
+        }
+
+        .findings-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .no-findings-container {
+            padding: 2rem 1.5rem !important;
+        }
+
+        .no-findings {
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .finding-card {
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(30, 30, 30, 0.7));
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            border-left: 4px solid var(--border-color);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .finding-card:hover {
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            transform: translateY(-2px);
+            border-color: rgba(88, 101, 242, 0.3);
+        }
+
+        .finding-card.severity-critical {
+            border-left-color: var(--accent-negative);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(20, 20, 20, 0.9));
+        }
+
+        .finding-card.severity-high {
+            border-left-color: #f97316;
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.05), rgba(20, 20, 20, 0.9));
+        }
+
+        .finding-card.severity-medium {
+            border-left-color: var(--accent-warning);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), rgba(20, 20, 20, 0.9));
+        }
+
+        .finding-card.severity-low {
+            border-left-color: #6b7280;
+            background: linear-gradient(135deg, rgba(107, 114, 128, 0.05), rgba(20, 20, 20, 0.9));
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .severity-pill {
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .severity-pill.critical {
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            color: white;
+            box-shadow: 0 2px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        .severity-pill.high {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: white;
+            box-shadow: 0 2px 12px rgba(249, 115, 22, 0.4);
+        }
+
+        .severity-pill.medium {
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+            color: white;
+            box-shadow: 0 2px 12px rgba(245, 158, 11, 0.4);
+        }
+
+        .severity-pill.low {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+            color: white;
+            box-shadow: 0 2px 12px rgba(107, 114, 128, 0.4);
+        }
+
+        .finding-name {
+            font-size: 1rem;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .finding-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .detail-value {
+            font-weight: 500;
+        }
+
+        code.detail-value {
+            background-color: var(--background-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 0.9em;
+            word-break: break-all;
+        }
+
+        /* Instance Status Styling */
+        .instance-status {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.85em;
+            border: 2px solid;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+        }
+
+        .instance-status-in-instance {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.15)) !important;
+            border-color: var(--accent-negative) !important;
+            color: #fca5a5 !important;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+            animation: pulse-red 2s infinite;
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
+        }
+
+        .instance-status-boot-instance {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.15)) !important;
+            border-color: var(--accent-warning) !important;
+            color: #fcd34d !important;
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+        }
+
+        .instance-status-out-of-instance {
+            background: linear-gradient(135deg, rgba(107, 114, 128, 0.15), rgba(75, 85, 99, 0.1)) !important;
+            border-color: #6b7280 !important;
+            color: #9ca3af !important;
+        }
+
+        .copyable {
+            cursor: pointer;
+        }
+
+        .copyable:hover {
+            background-color: var(--surface-color);
+        }
+
+        /* Accordions for threats */
+        .findings-accordion {
+            scroll-margin-top: 100px;
+        }
+
+        .findings-accordion summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            cursor: pointer;
+            list-style: none;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(90deg, rgba(88, 101, 242, 0.03), transparent);
+        }
+        .findings-accordion:first-of-type summary { border-top: 1px solid var(--border-color); }
+        .findings-accordion:last-of-type summary { border-bottom: none; }
+        .findings-accordion[open]:last-of-type summary { border-bottom: 1px solid var(--border-color); }
+
+        .findings-accordion summary:hover {
+            background: linear-gradient(90deg, rgba(88, 101, 242, 0.08), transparent);
+            border-left: 3px solid var(--discord-blurple);
+        }
+
+        .findings-accordion summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .accordion-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .accordion-title svg {
+            color: var(--text-secondary);
+            width: 20px;
+            height: 20px;
+        }
+
+        .accordion-title h3 {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+            letter-spacing: 0.02em;
+        }
+
+        .accordion-counter {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 0.8rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .findings-accordion .chevron {
+            transition: transform 0.3s ease;
+        }
+
+        .findings-accordion[open]>summary .chevron {
+            transform: rotate(90deg);
+        }
+
+        .findings-list {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background-color: rgba(0,0,0,0.2);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .findings-accordion:last-of-type .findings-list { border-bottom: none; }
+
+
+        /* System Info & Identities Grid */
+        .info-card {
+            background: none;
+            padding: 0;
+            border: none;
+        }
+
+        .info-card h4 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 0;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .info-row:not(:last-child) {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .info-key {
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .info-val {
+            color: var(--text-primary);
+            font-weight: 500;
+            text-align: right;
+            font-size: 0.9rem;
+        }
+        .info-val code {
+            font-size: 0.9em;
+            background-color: var(--background-color);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+        }
+
+        /* Logged Activity & Artifacts Tabs */
+        .tab-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tab-nav {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            color: var(--text-primary);
+            border-bottom-color: var(--discord-blurple);
+        }
+
+        .tab-content {
+            padding: 1.5rem 0 0;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        .tab-pane-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* Logged Activity styling */
+        .log-entry.browser-history a {
+            color: var(--discord-blurple);
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .log-entry.browser-history a:hover {
+            text-decoration: underline;
+        }
+
+        .log-entry.browser-history .browser-title {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .log-entry.command-history .command-terminal {
+            background: #000;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .command-terminal .prompt {
+            color: var(--accent-positive);
+        }
+
+        .command-terminal .command-text {
+            color: var(--text-primary);
+        }
+
+        .command-terminal .command-meta {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .artifact-card {
+            background: var(--surface-color);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .artifact-card.threat {
+            border-left: 3px solid var(--accent-negative);
+        }
+
+        .artifact-card.warning {
+            border-left: 3px solid var(--accent-warning);
+        }
+
+        .artifact-card.risk-safe {
+            border-left: 3px solid var(--accent-positive);
+        }
+
+        .artifact-card.risk-suspicious {
+            border-left: 3px solid var(--accent-warning);
+        }
+
+        .artifact-card.risk-dangerous {
+            border-left: 3px solid var(--accent-negative);
+        }
+
+        .artifact-icon {
+            color: var(--text-secondary);
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .artifact-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .artifact-details {
+            word-break: break-word;
+        }
+
+        .artifact-details strong {
+            color: var(--text-primary);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            user-select: none;
+        }
+
+        .pagination-btn {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .report-layout {
+                grid-template-columns: 1fr;
+            }
+            .sidebar-content {
+                position: static;
+                grid-row: 1;
+            }
+        }
+        @media (max-width: 768px) {
+            .dashboard-header {
+                padding: 1rem;
+                flex-wrap: wrap;
+            }
+
+            #dashboard-title {
+                order: 2;
+                flex-basis: 100%;
+                text-align: center;
+            }
+
+            .back-btn {
+                order: 1;
+            }
+
+            #header-actions {
+                order: 3;
+            }
+
+            .dashboard-content {
+                padding: 1rem;
+            }
+
+            .report-hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 2rem;
+            }
+            .risk-gauge { margin: 0 auto; }
+
+            .hero-summary .summary-subtitle {
+                margin: 0 auto;
+            }
+
+            .hero-summary .summary-title {
+                font-size: 1.5rem;
+            }
+            .summary-breakdown { justify-content: center; }
+            
+            .report-actions {
+                gap: 0.5rem;
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .action-item>label {
+                display: none;
+            }
+        }
+
+        /* Search Bar */
+        .shortcuts-bar {
+            display: none;
+            padding: 1.5rem 2rem;
+            background-color: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 73px;
+            z-index: 9;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            max-width: 500px;
+            transition: all 0.2s ease;
+            margin-bottom: 1rem;
+        }
+
+        .search-box svg {
+            width: 20px;
+            height: 20px;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+
+        .search-box input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .search-box:focus-within {
+            border-color: var(--discord-blurple);
+            box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.1);
+        }
+
+        /* Search Results Info Sidebar */
+        .search-results-info {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            max-width: 500px;
+            display: none;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .search-results-info.visible {
+            display: flex;
+        }
+
+        .search-result-item {
+            background: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .search-result-item:hover {
+            border-left-color: var(--discord-blurple);
+            background: rgba(88, 101, 242, 0.05);
+        }
+
+        .search-result-item.severity-critical {
+            border-left-color: var(--accent-negative);
+        }
+
+        .search-result-item.severity-high {
+            border-left-color: #f97316;
+        }
+
+        .search-result-item.severity-medium {
+            border-left-color: var(--accent-warning);
+        }
+
+        .search-result-item.severity-low {
+            border-left-color: #6b7280;
+        }
+
+        .search-result-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .search-result-severity {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .search-result-severity.critical {
+            background: var(--accent-negative);
+            color: white;
+        }
+
+        .search-result-severity.high {
+            background: #f97316;
+            color: white;
+        }
+
+        .search-result-severity.medium {
+            background: var(--accent-warning);
+            color: white;
+        }
+
+        .search-result-severity.low {
+            background: #6b7280;
+            color: white;
+        }
+
+        .search-result-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex: 1;
+        }
+
+        .search-result-path {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+        }
+
+        .search-no-results {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 1rem;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .search-box {
+                max-width: 100%;
+            }
+            
+            .shortcuts-bar {
+                padding: 1rem;
+                top: 60px;
+            }
+
+            .search-results-info {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="true-background"></div>
+    <div id="background-glow"></div>
+    <div id="background-animations"></div>
+    <div id="app-container">
+        <main class="dashboard">
+            <header class="dashboard-header">
+                <a href="/dashboard.html" class="back-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                    <span>Back to Dashboard</span>
+                </a>
+                <h1 id="dashboard-title">Analysis Report</h1>
+                <div id="header-actions" class="report-actions">
+                    <!-- JS will populate this -->
+                </div>
+            </header>
+            <div class="dashboard-content">
+                <!-- Search Bar -->
+                <div class="shortcuts-bar" id="shortcuts-bar" style="display: none;">
+                    <div class="search-box">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" id="report-search" placeholder="Search in report... (Ctrl+F)" />
+                    </div>
+                    <div class="search-results-info" id="search-results-info">
+                        <!-- Search results will be displayed here -->
+                    </div>
+                </div>
+
+                <div id="report-page-content">
+                    <!-- Report content will be injected here -->
+                </div>
+            </div>
+        </main>
+    </div>
+    <script type="module">
+        let currentUser = null;
+        const container = document.getElementById('report-page-content');
+        const headerTitle = document.getElementById('dashboard-title');
+        const shortcutsBar = document.getElementById('shortcuts-bar');
+
+        // Shortcuts Bar Functionality
+        function initShortcutsBar() {
+            // Initialize search functionality
+            initSearch();
+        }
+
+        // Search Functionality
+        function initSearch() {
+            const searchInput = document.getElementById('report-search');
+            if (!searchInput) return;
+
+            let searchTimeout;
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    performSearch(e.target.value);
+                }, 300);
+            });
+
+            // Ctrl+F to focus search
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                    e.preventDefault();
+                    searchInput.focus();
+                }
+            });
+        }
+
+        function performSearch(query) {
+            const resultsContainer = document.getElementById('search-results-info');
+            if (!resultsContainer) return;
+
+            // Clear previous results
+            resultsContainer.innerHTML = '';
+            resultsContainer.classList.remove('visible');
+
+            if (!query || query.length < 2) return;
+
+            const content = document.getElementById('report-page-content');
+            if (!content) return;
+
+            // Find all finding cards that match the search query
+            const findingCards = content.querySelectorAll('.finding-card');
+            const matches = [];
+            const regex = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+
+            findingCards.forEach(card => {
+                // Search in finding name
+                const nameEl = card.querySelector('.finding-name');
+                const pathEl = card.querySelector('.detail-value.copyable');
+                
+                const name = nameEl ? nameEl.textContent : '';
+                const path = pathEl ? pathEl.textContent : '';
+                
+                // Check if query matches name or path
+                if (regex.test(name) || regex.test(path)) {
+                    const severityPill = card.querySelector('.severity-pill');
+                    const severity = severityPill ? severityPill.textContent.toLowerCase() : 'low';
+                    
+                    matches.push({
+                        card: card,
+                        name: name,
+                        path: path,
+                        severity: severity
+                    });
+                }
+            });
+
+            // Display results
+            if (matches.length === 0) {
+                resultsContainer.innerHTML = '<div class="search-no-results">No results found</div>';
+                resultsContainer.classList.add('visible');
+                return;
+            }
+
+            resultsContainer.classList.add('visible');
+            matches.forEach((match, index) => {
+                const resultItem = document.createElement('div');
+                resultItem.className = `search-result-item severity-${match.severity}`;
+                resultItem.innerHTML = `
+                    <div class="search-result-header">
+                        <span class="search-result-severity ${match.severity}">${match.severity}</span>
+                        <span class="search-result-name">${match.name}</span>
+                    </div>
+                    <div class="search-result-path">${match.path}</div>
+                `;
+                
+                // Click to scroll to the finding
+                resultItem.addEventListener('click', () => {
+                    match.card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // Highlight the card temporarily
+                    match.card.style.boxShadow = '0 0 20px rgba(88, 101, 242, 0.6)';
+                    setTimeout(() => {
+                        match.card.style.boxShadow = '';
+                    }, 2000);
+                });
+                
+                resultsContainer.appendChild(resultItem);
+            });
+        }
+
+        function updateShortcutBadges(scanData) {
+            // Show shortcuts bar
+            if (shortcutsBar) {
+                shortcutsBar.style.display = 'block';
+            }
+        }
+
+        function formatDate(isoString) {
+            if (!isoString) return 'N/A';
+            try {
+                const date = new Date(isoString);
+                // Format as UTC time to avoid timezone issues
+                const year = date.getUTCFullYear();
+                const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+                const day = String(date.getUTCDate()).padStart(2, '0');
+                const hours = String(date.getUTCHours()).padStart(2, '0');
+                const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+                const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+                return `${year}-${month}-${day} ${hours}:${minutes}:${seconds} UTC`;
+            } catch (e) {
+                return isoString;
+            }
+        }
+        
+        function createFloatingSymbols() {
+            const container = document.getElementById('background-animations');
+            if (!container) return;
+            const symbolCount = 20;
+            for (let i = 0; i < symbolCount; i++) {
+                const symbol = document.createElement('span');
+                symbol.classList.add('floating-symbol');
+                symbol.innerHTML = '&lt;/&gt;';
+                symbol.style.left = `${Math.random() * 100}vw`;
+                symbol.style.top = `${Math.random() * 100}vh`;
+                symbol.style.fontSize = `${Math.random() * 20 + 10}px`;
+                symbol.style.animationDuration = `${Math.random() * 15 + 10}s`;
+                symbol.style.animationDelay = `${Math.random() * 5}s`;
+                container.appendChild(symbol);
+            }
+        }
+        createFloatingSymbols();
+
+        const categoryIcons = {
+            'CUSTOM_RULES': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+            'HEURISTIC_BEHAVIORAL_ANALYSIS': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>`,
+            'YARA_SIGNATURE_MATCHES': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>`,
+            'MEMORY_HOOKING_DETECTION': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>`,
+            'PROCESS_AND_MEMORY_ANOMALIES': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 9v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9"/><path d="M9 22V12h6v10M2 10.6L12 2l10 8.6"/></svg>`,
+            'FILE_SYSTEM_HASH_MATCHES': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/></svg>`,
+            'FILE_SYSTEM_KEYWORD_MATCHES': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>`,
+            'SUSPICIOUS_CONFIG_FILES': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><path d="M12 18v-6"/><path d="m9 15 3-3 3 3"/></svg>`,
+            'SYSTEM_EXECUTION_EVIDENCE': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+            'NETWORK_ACTIVITY': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>`,
+            'COMMAND_LINE_HISTORY': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>`,
+            'USN_JOURNAL_HISTORY': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`,
+            'EVIDENCE_CLEANING_TOOLS': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18l-1.5 14.5H4.5L3 6z"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>`,
+            'RECYCLE_BIN_INFO': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`,
+            'HARDWARE_AND_PERIPHERALS': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="12" x2="2" y2="12"></line><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path><line x1="6" y1="16" x2="6.01" y2="16"></line><line x1="10" y1="16" x2="10.01" y2="16"></line></svg>`,
+            'BYPASS_METHODS': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
+            'PREFETCH_EVIDENCE': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>`,
+            'REGISTRY_FORENSICS': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>`,
+            'SHIMCACHE_EVIDENCE': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>`,
+            'SYSTEM_INTEGRITY_CHECKS': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
+            'Uncategorized': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`
+        };
+
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/user');
+                if (!response.ok) {
+                    window.location.href = '/index.html';
+                    return null;
+                }
+                const userData = await response.json();
+                sessionStorage.setItem('currentUser', JSON.stringify(userData));
+                if (userData.is_banned || !userData.has_license) {
+                    window.location.href = '/unlicensed.html';
+                    return null;
+                }
+                currentUser = userData;
+                return userData;
+            } catch (error) {
+                console.error("Auth check failed:", error);
+                window.location.href = '/index.html';
+                return null;
+            }
+        }
+
+        async function deleteScan(scanId) {
+            try {
+                const response = await fetch(`/api/scans/${scanId}`, { method: 'DELETE' });
+                if (!response.ok) throw new Error('Failed to delete scan.');
+                return true;
+            } catch (error) {
+                console.error(error);
+                showNotification('Failed to delete the report. Please try again', 'error');
+                return false;
+            }
+        }
+
+        async function setScanPublicStatus(scanId, isPublic) {
+            try {
+                const response = await fetch(`/api/scans/${scanId}/public`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ isPublic }),
+                });
+                if (!response.ok) throw new Error('Failed to update public status.');
+            } catch (error) {
+                console.error(error);
+                showNotification('Failed to update report status. Please try again', 'error');
+            }
+        }
+
+        function renderPaginatedList(container, items, renderItemFn, itemsPerPage = 10) {
+            if (!items || items.length === 0) {
+                container.innerHTML = '<p class="no-findings">No items to display in this category.</p>';
+                return;
+            }
+
+            let currentPage = 1;
+            const totalPages = Math.ceil(items.length / itemsPerPage);
+
+            function renderPage(page) {
+                currentPage = page;
+                const start = (page - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+                const pageItems = items.slice(start, end);
+
+                const itemsHtml = pageItems.map(renderItemFn).join('');
+
+                const paginationHtml = totalPages > 1 ? `
+                    <div class="pagination">
+                        <button class="pagination-btn" id="prev-page" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>
+                        <span class="page-info">Page ${currentPage} of ${totalPages}</span>
+                        <button class="pagination-btn" id="next-page" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>
+                    </div>` : '';
+
+                container.innerHTML = `<div class="tab-pane-content">${itemsHtml}</div>${paginationHtml}`;
+            }
+
+            renderPage(1);
+
+            container.addEventListener('click', e => {
+                if (e.target.id === 'prev-page' && currentPage > 1) {
+                    renderPage(currentPage - 1);
+                }
+                if (e.target.id === 'next-page' && currentPage < totalPages) {
+                    renderPage(currentPage + 1);
+                }
+            });
+        }
+
+        function escapeHtml(unsafe) {
+            if (typeof unsafe !== 'string') return '';
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        const renderArtifactList = (containerId, artifacts, defaultIconKey) => {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            renderPaginatedList(container, artifacts, (item) => {
+                const icon = categoryIcons[defaultIconKey || item.category] || categoryIcons.Uncategorized;
+                const itemClass = item.status || 'info';
+
+                let contentHtml = '';
+                const descriptionHtml = escapeHtml(item.description || '').replace(/`([^`]+)`/g, '<code>$1</code>');
+                const detailsHtml = item.details ? `<p class="detail-value">${escapeHtml(item.details).replace(/`([^`]+)`/g, '<code>$1</code>')}</p>` : '';
+                contentHtml = `<strong class="detail-label">${descriptionHtml}</strong>${detailsHtml}`;
+
+                return `
+                <div class="artifact-card ${itemClass}">
+                    <div class="artifact-icon">${icon}</div>
+                    <div class="artifact-details">
+                        ${contentHtml}
+                    </div>
+                </div>`;
+            });
+        };
+        
+        const renderLoggedActivity = (containerId, browser_history, command_history, grouped_artifacts) => {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const recycleBinItems = (grouped_artifacts['RECYCLE_BIN_INFO'] || []).map(item => ({
+                ...item,
+                type: 'recycle_bin'
+            }));
+
+            const allActivity = [...(browser_history || []), ...(command_history || []), ...recycleBinItems];
+
+            if (allActivity.length === 0) {
+                container.innerHTML = '<div class="tab-pane-content"><p class="no-findings">No logged activity found.</p></div>';
+                return;
+            }
+
+            renderPaginatedList(container, allActivity, (item) => {
+                // Check if it's a browser history item (has url or browser field)
+                if (item.url || item.browser) {
+                    const displayUrl = item.url || 'Unknown URL';
+                    return `
+                    <div class="artifact-card log-entry browser-history">
+                        <div class="artifact-icon">${categoryIcons.NETWORK_ACTIVITY}</div>
+                        <div class="artifact-details">
+                            <a href="${escapeHtml(displayUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(displayUrl)}</a>
+                            ${item.title ? `<div class="browser-title">${escapeHtml(item.browser || 'Browser')}: ${escapeHtml(item.title)}</div>` : ''}
+                            ${item.browser && !item.title ? `<div class="browser-title">${escapeHtml(item.browser)}</div>` : ''}
+                        </div>
+                    </div>`;
+                } 
+                // Check if it's a recycle bin item
+                else if (item.type === 'recycle_bin') {
+                    return `
+                    <div class="artifact-card log-entry recycle-bin">
+                        <div class="artifact-icon">${categoryIcons.RECYCLE_BIN_INFO}</div>
+                        <div class="artifact-details">
+                            <strong>${escapeHtml(item.description).replace(/`([^`]+)`/g, '<code>$1</code>')}</strong>
+                            ${item.details ? `<p>${escapeHtml(item.details).replace(/`([^`]+)`/g, '<code>$1</code>')}</p>` : ''}
+                        </div>
+                    </div>`;
+                } 
+                // Check if it's a command history item (has command field)
+                else if (item.command) {
+                    return `
+                    <div class="artifact-card log-entry command-history">
+                        <div class="artifact-icon">${categoryIcons.COMMAND_LINE_HISTORY}</div>
+                         <div class="artifact-details">
+                            <div class="command-terminal">
+                                <span class="prompt">&gt; </span><span class="command-text">${escapeHtml(item.command)}</span>
+                                <div class="command-meta">Source: ${escapeHtml(item.type || 'Unknown')} ${item.keywords_found ? `| Keyword: ${escapeHtml(item.keywords_found)}` : ''}</div>
+                            </div>
+                        </div>
+                    </div>`;
+                }
+                // Fallback for unknown items
+                else {
+                    return `
+                    <div class="artifact-card log-entry">
+                        <div class="artifact-icon">${categoryIcons.Uncategorized}</div>
+                        <div class="artifact-details">
+                            <p>${JSON.stringify(item)}</p>
+                        </div>
+                    </div>`;
+                }
+            });
+        };
+
+        const renderHardwareArtifacts = (containerId, hardwareItems) => {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            if (!hardwareItems || hardwareItems.length === 0) {
+                container.innerHTML = `
+                    <div class="tab-pane-content">
+                        <div class="artifact-card info">
+                            <div class="artifact-icon">${categoryIcons['HARDWARE_AND_PERIPHERALS']}</div>
+                            <div class="artifact-details">
+                                <strong class="detail-label">No hardware or peripheral data found</strong>
+                                <p class="detail-value">No USB devices or peripherals were detected during the scan.</p>
+                            </div>
+                        </div>
+                    </div>`;
+                return;
+            }
+
+            renderPaginatedList(container, hardwareItems, (item) => {
+                const icon = categoryIcons['HARDWARE_AND_PERIPHERALS'];
+                const itemClass = item.status || 'info';
+
+                const deviceName = item.key || item.name || 'Unknown Device';
+                const deviceDetails = item.value || item.details || 'No details available';
+
+                return `
+                <div class="artifact-card ${itemClass}">
+                    <div class="artifact-icon">${icon}</div>
+                    <div class="artifact-details">
+                        <strong class="detail-label">${escapeHtml(deviceName)}</strong>
+                        <p class="detail-value">${escapeHtml(deviceDetails).replace(/`([^`]+)`/g, '<code>$1</code>')}</p>
+                    </div>
+                </div>`;
+            });
+        };
+
+        const renderRecentExecutables = (containerId, executables) => {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const sortedExecutables = (executables || []).sort((a, b) => {
+                if (!a.last_executed || !b.last_executed) return 0;
+                return new Date(b.last_executed) - new Date(a.last_executed);
+            });
+
+            renderPaginatedList(container, sortedExecutables, (item) => {
+                const riskClass = `risk-${item.risk_level}`;
+                const executionTime = item.last_executed ? formatDate(item.last_executed) : 'N/A';
+                const detailsHtml = item.details ? `<p>${escapeHtml(item.details)}</p>` : '';
+                const icon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="15" x2="15" y2="15"></line></svg>`;
+
+                return `
+                <div class="artifact-card ${riskClass}">
+                    <div class="artifact-icon">${icon}</div>
+                    <div class="artifact-details">
+                        <strong><code>${escapeHtml(item.process_name)}</code></strong>
+                        <p>Last Executed: ${executionTime}</p>
+                        ${detailsHtml}
+                    </div>
+                </div>`;
+            });
+        };
+
+        const renderGameAnalysis = (containerId, artifacts) => {
+            renderArtifactList(containerId, artifacts, 'FIVEM_ANALYSIS');
+        };
+
+        const renderBypassMethods = (containerId, bypassMethods) => {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            if (!bypassMethods || bypassMethods.length === 0) {
+                container.innerHTML = `
+                    <div class="tab-pane-content">
+                        <div class="artifact-card" style="border-left-color: var(--accent-positive);">
+                            <div class="artifact-icon">${categoryIcons['BYPASS_METHODS']}</div>
+                            <div class="artifact-details">
+                                <strong class="detail-label" style="color: var(--accent-positive);">✅ No Bypass Methods Detected</strong>
+                                <p class="detail-value">The system shows no signs of anti-forensics techniques or evidence tampering. All logging services are active and forensic artifacts are intact.</p>
+                            </div>
+                        </div>
+                    </div>`;
+                return;
+            }
+
+            // Find the overall assessment (first item with "Overall Bypass Assessment")
+            const assessment = bypassMethods.find(item => item.method && item.method.includes('Overall Bypass Assessment'));
+            const methods = bypassMethods.filter(item => item !== assessment);
+
+            renderPaginatedList(container, bypassMethods, (item) => {
+                const isAssessment = item.method && item.method.includes('Overall Bypass Assessment');
+                const severityClass = (item.severity || 'info').toLowerCase();
+                const severityColor = {
+                    'critical': 'var(--accent-negative)',
+                    'high': '#f97316',
+                    'medium': 'var(--accent-warning)',
+                    'low': 'var(--text-secondary)'
+                };
+                const color = severityColor[severityClass] || 'var(--text-secondary)';
+
+                const icon = isAssessment 
+                    ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>`
+                    : categoryIcons['BYPASS_METHODS'];
+
+                const methodName = escapeHtml(item.method || 'Unknown Method');
+                const description = escapeHtml(item.description || '').replace(/`([^`]+)`/g, '<code>$1</code>');
+                const details = item.details ? escapeHtml(item.details).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\n/g, '<br>') : '';
+                const impact = item.impact ? `<p style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(239, 68, 68, 0.1); border-left: 3px solid var(--accent-negative); border-radius: 4px;"><strong>Impact:</strong> ${escapeHtml(item.impact)}</p>` : '';
+
+                return `
+                <div class="artifact-card ${severityClass}" style="border-left-width: 4px; ${isAssessment ? 'background: linear-gradient(135deg, rgba(88, 101, 242, 0.1), rgba(20, 20, 20, 0.9));' : ''}">
+                    <div class="artifact-icon" style="color: ${color};">${icon}</div>
+                    <div class="artifact-details">
+                        <strong class="detail-label" style="font-size: 1.1em; color: ${color};">
+                            ${isAssessment ? '🚨 ' : ''}${methodName}
+                            ${item.severity ? `<span style="float: right; font-size: 0.8em; padding: 0.2rem 0.6rem; background: ${color}; color: white; border-radius: 12px; text-transform: uppercase;">${item.severity}</span>` : ''}
+                        </strong>
+                        <p class="detail-value" style="margin-top: 0.5rem;">${description}</p>
+                        ${details ? `<div style="margin-top: 0.75rem; padding: 0.75rem; background: rgba(0,0,0,0.3); border-radius: 6px; font-size: 0.9em; line-height: 1.6;">${details}</div>` : ''}
+                        ${impact}
+                    </div>
+                </div>`;
+            });
+        };
+
+        function renderEnhancedReport(scanDetails) {
+            const { scan, grouped_findings, system_info, user_identities, browser_history, command_history, game_analysis, grouped_artifacts, recent_executables } = scanDetails;
+            const { id, pin, timestamp, is_public, game } = scan;
+            headerTitle.textContent = `Analysis for ${game.toUpperCase()} (PIN: ${pin})`;
+
+            const headerActionsContainer = document.getElementById('header-actions');
+            if (headerActionsContainer) {
+                const canManageScan = currentUser && (currentUser.id === scan.user_id || currentUser.role === 'admin');
+                if (canManageScan) {
+                    headerActionsContainer.innerHTML = `
+                        <div class="action-item">
+                            <label for="public-toggle">Public Report</label>
+                            <label class="switch">
+                                <input type="checkbox" id="public-toggle" ${is_public ? 'checked' : ''}>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <button id="delete-report-btn" class="danger-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                            <span>Delete</span>
+                        </button>
+                    `;
+                    headerActionsContainer.querySelector('#delete-report-btn')?.addEventListener('click', async () => {
+                        if (window.confirm('Are you sure you want to permanently delete this report?')) {
+                            if (await deleteScan(id)) window.location.href = '/results.html';
+                        }
+                    });
+                    headerActionsContainer.querySelector('#public-toggle')?.addEventListener('change', (e) => setScanPublicStatus(id, e.target.checked));
+                }
+            }
+
+            const allFindings = Object.values(grouped_findings).flat();
+            const severityCounts = {
+                Critical: allFindings.filter(f => f.severity === 'Critical').length,
+                High: allFindings.filter(f => f.severity === 'High').length,
+                Medium: allFindings.filter(f => f.severity === 'Medium').length,
+                Low: allFindings.filter(f => f.severity === 'Low').length
+            };
+
+            const riskMap = { 'Critical': 100, 'High': 75, 'Medium': 50, 'Low': 25, 'None': 0 };
+            const highestRiskFinding = allFindings.length > 0
+                ? allFindings.reduce((max, current) => (riskMap[current.severity] > riskMap[max.severity]) ? current : max, { severity: 'None' })
+                : { severity: 'None' };
+
+            const overallRisk = highestRiskFinding.severity;
+            const riskScore = riskMap[overallRisk];
+            const riskClass = overallRisk.toLowerCase();
+
+            const gaugeRadius = 80;
+            const gaugeCircumference = 2 * Math.PI * gaugeRadius;
+            const gaugeValue = gaugeCircumference * (1 - riskScore / 100);
+
+            // Helper function to normalize instance status (convert old timestamps to new format)
+            const normalizeInstanceStatus = (status) => {
+                if (!status) return 'Out of instance';
+                
+                // If it's already in the new format, return as-is
+                if (status === 'In instance' || status === 'Boot instance' || status === 'Out of instance') {
+                    return status;
+                }
+                
+                // If it's a timestamp (contains numbers and dashes/colons), convert to "Out of instance"
+                if (/\d{4}-\d{2}-\d{2}/.test(status) || /\d{2}:\d{2}:\d{2}/.test(status)) {
+                    return 'Out of instance';
+                }
+                
+                // Default to "Out of instance" for any other format
+                return 'Out of instance';
+            };
+
+            const renderThreats = (groupedFindings) => {
+                if (allFindings.length === 0) {
+                    return '<div class="card no-findings-container"><p class="no-findings">No threats were detected in this scan.</p></div>';
+                }
+
+                const threatCategories = {
+                    'Custom Rules': ['custom_rules', 'customhash', 'customkeyword'],
+                    'Aimbot & ESP': ['aimbot', 'esp', 'wallhack', 'triggerbot', 'radar'],
+                    'Loaders & Injectors': ['loader', 'injector', 'inject', 'dll inject'],
+                    'Bypass & Spoofers': ['bypass', 'spoofer', 'hwid spoof', 'anti-cheat bypass'],
+                    'Memory Manipulation': ['memory', 'hook', 'patch', 'detour'],
+                    'Known Cheats': ['eulen', '420', 'cherax', 'stand', 'midnight', 'impulse', 'keyser', 'hx'],
+                    'Suspicious Files': ['suspicious', 'keyword'],
+                    'Other Detections': []
+                };
+
+                const categorizedFindings = {};
+                Object.entries(groupedFindings).forEach(([category, items]) => {
+                    items.forEach(threat => {
+                        const threatName = (threat.name || '').toLowerCase();
+                        const threatPath = (threat.path || '').toLowerCase();
+                        const threatCategory = (threat.category || '').toLowerCase();
+                        
+                        // Direct match for CUSTOM_RULES category
+                        if (category === 'CUSTOM_RULES' || threatCategory === 'custom_rules') {
+                            if (!categorizedFindings['Custom Rules']) categorizedFindings['Custom Rules'] = [];
+                            categorizedFindings['Custom Rules'].push({ ...threat, originalCategory: category });
+                            return;
+                        }
+                        
+                        let assigned = false;
+                        for (const [catName, keywords] of Object.entries(threatCategories)) {
+                            if (catName === 'Other Detections' || catName === 'Custom Rules') continue;
+                            
+                            for (const keyword of keywords) {
+                                if (threatName.includes(keyword) || threatPath.includes(keyword) || threatCategory.includes(keyword)) {
+                                    if (!categorizedFindings[catName]) categorizedFindings[catName] = [];
+                                    categorizedFindings[catName].push({ ...threat, originalCategory: category });
+                                    assigned = true;
+                                    break;
+                                }
+                            }
+                            if (assigned) break;
+                        }
+                        
+                        if (!assigned) {
+                            if (!categorizedFindings['Other Detections']) categorizedFindings['Other Detections'] = [];
+                            categorizedFindings['Other Detections'].push({ ...threat, originalCategory: category });
+                        }
+                    });
+                });
+
+                const categoryPriority = { 'Critical': 1, 'High': 2, 'Medium': 3, 'Low': 4 };
+                const sortedCategories = Object.entries(categorizedFindings).sort(([catA, itemsA], [catB, itemsB]) => {
+                    const maxSevA = Math.min(...itemsA.map(i => categoryPriority[i.severity] || 5));
+                    const maxSevB = Math.min(...itemsB.map(i => categoryPriority[i.severity] || 5));
+                    return maxSevA - maxSevB;
+                });
+
+                const getCategoryIcon = (catName) => {
+                    const icons = {
+                        'Custom Rules': `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
+                        'Aimbot & ESP': `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`,
+                        'Loaders & Injectors': `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+                        'Bypass & Spoofers': `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>`,
+                        'Memory Manipulation': `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>`,
+                        'Known Cheats': `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+                        'Suspicious Files': `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`,
+                        'Other Detections': `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>`
+                    };
+                    return icons[catName] || icons['Other Detections'];
+                };
+
+                return sortedCategories.map(([category, items]) => `
+                    <details class="findings-accordion">
+                        <summary>
+                            <div class="accordion-title">
+                                <span style="display: flex; align-items: center; color: var(--discord-blurple);">${getCategoryIcon(category)}</span>
+                                <h3>${category}</h3>
+                                <span class="accordion-counter">${items.length}</span>
+                            </div>
+                            <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </summary>
+                        <div class="findings-list">
+                            ${items.map(threat => `
+                                <div class="finding-card severity-${threat.severity.toLowerCase()}">
+                                    <div class="card-header">
+                                        <span class="severity-pill ${threat.severity.toLowerCase()}">${threat.severity}</span>
+                                        <h4 class="finding-name">${escapeHtml(threat.name)}</h4>
+                                        ${threat.originalCategory ? `<span style="font-size: 0.75rem; color: var(--text-secondary); margin-left: auto;">${threat.originalCategory}</span>` : ''}
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="finding-detail">
+                                            <span class="detail-label">Detection Source</span>
+                                            <code class="detail-value copyable" data-copy-text="${escapeHtml(threat.path)}" title="Click to copy path">${escapeHtml(threat.path)}</code>
+                                        </div>
+                                        <div class="finding-detail">
+                                            <span class="detail-label">Instance Status</span>
+                                            <code class="detail-value instance-status ${(() => {
+                                                const status = normalizeInstanceStatus(threat.last_execution_time);
+                                                if (status === 'In instance') return 'instance-status-in-instance';
+                                                if (status === 'Boot instance') return 'instance-status-boot-instance';
+                                                return 'instance-status-out-of-instance';
+                                            })()}">${escapeHtml(normalizeInstanceStatus(threat.last_execution_time))}</code>
+                                        </div>
+                                        ${threat.file_hash ? `<div class="finding-detail"><span class="detail-label">File Hash (SHA256)</span><code class="detail-value copyable" data-copy-text="${escapeHtml(threat.file_hash)}" title="Click to copy hash">${escapeHtml(threat.file_hash)}</code></div>` : ''}
+                                        ${threat.yara_rule ? `<div class="finding-detail"><span class="detail-label">YARA Rule</span><code class="detail-value">${escapeHtml(threat.yara_rule)}</code></div>` : ''}
+                                    </div>
+                                </div>`).join('')}
+                        </div>
+                    </details>`).join('');
+            };
+
+             const renderSidebar = (scan, system_info, user_identities) => {
+                const sysInfo = system_info && system_info.length > 0 ? system_info[0] : null;
+                const sysInfoHtml = sysInfo ? Object.entries(sysInfo).map(([key, value]) => {
+                    if (key === 'id' || key === 'scan_id' || !value) return '';
+                    const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    return `<div class="info-row"><span class="info-key">${formattedKey}</span><span class="info-val">${value}</span></div>`;
+                }).join('') : '<div class="info-row"><span class="info-key">No system data found.</span></div>';
+
+                // Parse user identities with additional_info
+                let identitiesHtml;
+                if (user_identities && user_identities.length > 0) {
+                    // Group identities by type
+                    const groupedIdentities = {};
+                    user_identities.forEach(identity => {
+                        const type = identity.identity_type;
+                        if (!groupedIdentities[type]) {
+                            groupedIdentities[type] = [];
+                        }
+                        groupedIdentities[type].push(identity);
+                    });
+
+                    // SVG Icons for platforms
+                    const platformIcons = {
+                        'Discord': `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z"/></svg>`,
+                        'Steam': `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-10 10a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2M6.5 14.5L5 13.9c.3.8 1.1 1.4 2 1.4c1.1 0 2-.9 2-2s-.9-2-2-2c-.4 0-.7.1-1 .3l1.5.6c.6.2.9.9.7 1.5c-.2.6-.9.9-1.5.7m9.5-1.5c0 1.9-1.6 3.5-3.5 3.5S9 14.9 9 13s1.6-3.5 3.5-3.5s3.5 1.6 3.5 3.5m-.5 0c0-1.4-1.1-2.5-2.5-2.5S10 11.6 10 13s1.1 2.5 2.5 2.5s2.5-1.1 2.5-2.5z"/></svg>`,
+                        'Windows': `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.557L10.5 4.5v6.75H3V5.557M10.5 12.75v6.75L3 18.443V12.75h7.5M12 4.25L21 3v8.25H12V4.25M21 12.75V21l-9-1.25v-7H21Z"/></svg>`,
+                        'default': `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`
+                    };
+
+                    identitiesHtml = Object.entries(groupedIdentities).map(([type, identities]) => {
+                        const icon = platformIcons[type] || platformIcons['default'];
+                        
+                        // Create user items with avatars and display names
+                        const uniqueUsers = new Map();
+                        identities.forEach(identity => {
+                            let additionalInfo = {};
+                            try {
+                                if (identity.additional_info) {
+                                    additionalInfo = JSON.parse(identity.additional_info);
+                                }
+                            } catch (e) {
+                                console.error('Failed to parse additional_info:', e);
+                            }
+                            
+                            const displayName = additionalInfo.display_name || identity.username || 'N/A';
+                            const avatarUrl = additionalInfo.avatar_url;
+                            
+                            // Use display name as key to avoid duplicates
+                            if (!uniqueUsers.has(displayName)) {
+                                uniqueUsers.set(displayName, { displayName, avatarUrl });
+                            }
+                        });
+                        
+                        // Build HTML for each unique user
+                        const usersHtml = Array.from(uniqueUsers.values()).map(user => {
+                            const avatarHtml = user.avatarUrl 
+                                ? `<img src="${user.avatarUrl}" alt="${user.displayName}" style="width: 20px; height: 20px; border-radius: 50%; vertical-align: middle; margin-right: 4px;">` 
+                                : '';
+                            return `${avatarHtml}${user.displayName}`;
+                        }).join(', ');
+                        
+                        return `
+                        <div class="info-row" style="align-items: center;">
+                            <span class="info-key" style="display: flex; align-items: center; gap: 6px;">
+                                <span style="display: inline-flex; color: var(--discord-blurple);">${icon}</span>
+                                ${type}
+                            </span>
+                            <span class="info-val" style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">${usersHtml}</span>
+                        </div>`;
+                    }).join('');
+                } else {
+                    identitiesHtml = '<div class="info-row"><span class="info-key">No user accounts found.</span></div>';
+                }
+
+                return `
+                    <div class="card">
+                        <h4>Scan Details</h4>
+                        <div class="info-row"><span class="info-key">PIN</span><span class="info-val">${scan.pin}</span></div>
+                        <div class="info-row"><span class="info-key">Scan Date</span><span class="info-val">${formatDate(scan.timestamp)}</span></div>
+                        <div class="info-row"><span class="info-key">Game</span><span class="info-val" style="text-transform: uppercase;">${scan.game}</span></div>
+                    </div>
+                     <div class="card">
+                        <h4>System Specs</h4>
+                        ${sysInfoHtml}
+                    </div>
+                     <div class="card">
+                        <h4>User Accounts</h4>
+                        ${identitiesHtml}
+                    </div>
+                `;
+            };
+
+            const TABS = [
+                { id: 'game-analysis', title: 'Game Analysis' },
+                { id: 'artifacts', title: 'Forensic Artifacts' },
+                { id: 'activity', title: 'Logged Activity' },
+                { id: 'executables', title: 'Recent Executions' },
+                { id: 'hardware', title: 'Hardware & Peripherals' },
+                { id: 'bypass-methods', title: 'Bypass Methods' }
+            ];
+            
+            const heroHtml = `
+                <div class="report-hero">
+                    <div class="risk-gauge">
+                        <svg viewBox="0 0 180 180">
+                            <circle class="gauge-track" cx="90" cy="90" r="${gaugeRadius}"></circle>
+                            <circle class="gauge-value stroke-${riskClass}" cx="90" cy="90" r="${gaugeRadius}" style="stroke-dasharray: ${gaugeCircumference}; stroke-dashoffset: ${gaugeCircumference};"></circle>
+                        </svg>
+                        <div class="gauge-text">
+                            <div class="gauge-score risk-${riskClass}">${riskScore}</div>
+                            <div class="gauge-label">Risk Score</div>
+                        </div>
+                    </div>
+                    <div class="hero-summary">
+                        <h2 class="summary-title">Overall Risk: <span class="risk-${riskClass}">${overallRisk}</span></h2>
+                        <p class="summary-subtitle">
+                            ${allFindings.length > 0 ? `The scan identified ${allFindings.length} potential threats, with the highest severity being ${overallRisk}.` : 'Scan complete. No direct threats or cheat signatures were identified.'}
+                        </p>
+                        <div class="summary-breakdown">
+                            ${severityCounts.Critical > 0 ? `<div class="breakdown-item"><div class="breakdown-dot critical"></div><div class="breakdown-count">${severityCounts.Critical}</div><div class="breakdown-label">Critical</div></div>` : ''}
+                            ${severityCounts.High > 0 ? `<div class="breakdown-item"><div class="breakdown-dot high"></div><div class="breakdown-count">${severityCounts.High}</div><div class="breakdown-label">High</div></div>` : ''}
+                            ${severityCounts.Medium > 0 ? `<div class="breakdown-item"><div class="breakdown-dot medium"></div><div class="breakdown-count">${severityCounts.Medium}</div><div class="breakdown-label">Medium</div></div>` : ''}
+                        </div>
+                    </div>
+                </div>`;
+
+            const mainContentHtml = `
+                ${heroHtml}
+                <div class="report-layout">
+                    <div class="main-content">
+                        <div class="card">
+                            <h2 class="section-title">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                Threat Analysis
+                            </h2>
+                            <div class="findings-container">
+                                ${renderThreats(grouped_findings)}
+                            </div>
+                        </div>
+                        <section class="card">
+                             <div class="tab-container">
+                                <div class="tab-nav">
+                                    ${TABS.map((tab, index) => `<button class="tab-btn ${index === 0 ? 'active' : ''}" data-tab="${tab.id}">${tab.title}</button>`).join('')}
+                                </div>
+                                <div class="tab-content">
+                                    ${TABS.map((tab, index) => `<div class="tab-pane ${index === 0 ? 'active' : ''}" id="${tab.id}-pane"></div>`).join('')}
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="sidebar-content">
+                        ${renderSidebar(scan, system_info, user_identities)}
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = mainContentHtml;
+
+            // --- Post-render setup ---
+            const genericArtifacts = Object.entries(grouped_artifacts)
+                .filter(([category]) => !['SYSTEM_INFORMATION', 'USER_IDENTITIES', 'BROWSER_HISTORY', 'COMMAND_HISTORY', 'RECENT_EXECUTABLES', 'SYSTEM_INTEGRITY_CHECKS', 'HARDWARE_AND_PERIPHERALS', 'BYPASS_METHODS', 'PREFETCH_EVIDENCE', 'REGISTRY_FORENSICS', 'SHIMCACHE_EVIDENCE', 'FIVEM_ANALYSIS', 'DAYZ_ANALYSIS', 'MINECRAFT_ANALYSIS', 'GAME_ANALYSIS'].includes(category))
+                .flatMap(([category, items]) => items.map(item => ({ ...item, category })));
+            
+            renderArtifactList('artifacts-pane', genericArtifacts);
+            renderLoggedActivity('activity-pane', browser_history, command_history, grouped_artifacts);
+            renderRecentExecutables('executables-pane', recent_executables);
+            renderHardwareArtifacts('hardware-pane', grouped_artifacts['HARDWARE_AND_PERIPHERALS'] || []);
+            renderBypassMethods('bypass-methods-pane', grouped_artifacts['BYPASS_METHODS'] || []);
+
+            const gameTableArtifacts = (game_analysis || []).flatMap(analysis => {
+                const artifacts = [];
+                if (analysis.installation_path) { artifacts.push({ description: 'Game Installation Path', details: `<code>${analysis.installation_path}</code>`, status: 'info' }); }
+                if (analysis.mod_detected) {
+                    artifacts.push({
+                        description: `Modification Detected: ${analysis.mod_name || 'Unknown Mod'}`,
+                        details: `Path: <code>${analysis.mod_path || 'N/A'}</code><br>Details: ${analysis.mod_details || 'None'}`,
+                        status: 'threat'
+                    });
+                }
+                return artifacts;
+            });
+            // Collect game artifacts from multiple possible sources
+            const gameGenericArtifacts = grouped_artifacts[`${game.toUpperCase()}_ANALYSIS`] || [];
+            const gameAnalysisArtifacts = grouped_artifacts['GAME_ANALYSIS'] || [];
+            const allGameArtifacts = [...gameTableArtifacts, ...gameGenericArtifacts, ...gameAnalysisArtifacts];
+            renderGameAnalysis('game-analysis-pane', allGameArtifacts);
+
+            setTimeout(() => {
+                const gauge = container.querySelector('.gauge-value');
+                if (gauge) gauge.style.strokeDashoffset = gaugeValue;
+            }, 100);
+
+            container.addEventListener('click', (e) => {
+                const copyEl = e.target.closest('.copyable');
+                if (copyEl) {
+                    const textToCopy = copyEl.dataset.copyText;
+                    const originalText = copyEl.innerHTML;
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        copyEl.textContent = 'Copied!';
+                        setTimeout(() => { copyEl.innerHTML = originalText; }, 1500);
+                    }).catch(err => console.error('Failed to copy text: ', err));
+                }
+            });
+
+            const tabContainer = container.querySelector('.tab-container');
+            if (tabContainer) {
+                tabContainer.querySelector('.tab-nav').addEventListener('click', e => {
+                    if (e.target.matches('.tab-btn')) {
+                        const tabId = e.target.dataset.tab;
+                        tabContainer.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                        tabContainer.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+                        e.target.classList.add('active');
+                        tabContainer.querySelector(`#${tabId}-pane`).classList.add('active');
+                    }
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = await checkAuth();
+            if (user) {
+                const params = new URLSearchParams(window.location.search);
+                const scanId = parseInt(params.get('id'), 10);
+
+                if (!scanId) {
+                    container.innerHTML = `<div class="card"><p>No scan ID provided.</p></div>`;
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/scans/${scanId}/details`);
+                    if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
+
+                    const scanDetails = await response.json();
+                    if (!scanDetails || !scanDetails.scan) throw new Error('Invalid scan data structure received');
+
+                    // Update shortcuts bar badges
+                    updateShortcutBadges(scanDetails);
+                    
+                    // Initialize shortcuts bar functionality
+                    initShortcutsBar();
+
+                    renderEnhancedReport(scanDetails);
+
+                } catch (error) {
+                    console.error('Error loading scan data:', error);
+                    container.innerHTML = `<div class="card">
+                        <h3 style="display: flex; align-items: center; gap: 0.5rem;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-negative);"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            Unexpected Error
+                        </h3>
+                        <p>An unexpected error occurred while loading the scan data.</p>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p><strong>Scan ID:</strong> ${scanId}</p>
+                        <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                            <button onclick="window.location.reload()" class="danger-btn">Retry</button>
+                            <a href="/results.html" class="danger-btn" style="text-decoration: none;">Back to Results</a>
+                        </div>
+                    </div>`;
+                }
+            }
+        });
+    </script>
+    <script>
+        // Fetch available rulepacks and display a console message (used by scanner clients)
+        (async function fetchRulepacks(){
+            try {
+                const resp = await fetch('/api/rulepacks');
+                if (!resp.ok) return console.warn('Could not fetch rulepacks');
+                const data = await resp.json();
+                console.log('Rulepacks loaded:', data);
+                // Optionally show a badge if rules present
+                if (data && data.rules && data.rules.length > 0) {
+                    console.log(`Available rulepacks: ${data.rules.length}`);
+                }
+            } catch (e) {
+                console.warn('Error fetching rulepacks', e);
+            }
+        })();
+    </script>
+</body>
+
+</html>

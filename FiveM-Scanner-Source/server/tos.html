@@ -1,0 +1,457 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service | </async> Scanner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;700&display=swap"
+        rel="stylesheet">
+    <script src="security.js"></script>
+  <script src="notifications.js"></script>
+    <style>
+        :root {
+            --background-color: #0A0A0A;
+            --surface-color: #141414;
+            --border-color: #2A2A2A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+            --accent-positive: #10B981;
+            --discord-blurple: #5865F2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            background-color: transparent;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        #true-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            z-index: -3;
+        }
+
+        #background-glow {
+            content: '';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 150vw;
+            height: 150vh;
+            max-width: 1200px;
+            max-height: 1200px;
+            background-image: radial-gradient(circle, rgba(88, 101, 242, 0.2), transparent 50%);
+            transform: translate(-50%, -50%);
+            animation: pulse 8s infinite ease-in-out;
+            z-index: -2;
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.7; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.7; }
+        }
+
+        #background-animations {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .floating-symbol {
+            position: absolute;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7), 0 0 20px rgba(255, 255, 255, 0.5);
+            opacity: 0.1;
+            user-select: none;
+            animation: float infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(20px, 40px) rotate(15deg); }
+            50% { transform: translate(-30px, -10px) rotate(-5deg); }
+            75% { transform: translate(10px, -50px) rotate(10deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        .faq-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 2rem;
+            z-index: 1;
+        }
+        
+        .page-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 2rem;
+        }
+        
+        .back-btn {
+            background-color: var(--surface-color);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        
+        .back-btn:hover {
+             background-color: var(--border-color);
+             color: var(--text-primary);
+        }
+
+        .secondary-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: var(--surface-color);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            font-family: inherit;
+        }
+        .secondary-btn:hover:not(:disabled) {
+            background-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        .secondary-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #terminal {
+            background: rgba(20, 20, 20, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            background: var(--surface-color);
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .terminal-dots .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-dots .dot.red { background-color: #ff5f56; }
+        .terminal-dots .dot.yellow { background-color: #ffbd2e; }
+        .terminal-dots .dot.green { background-color: #27c93f; }
+
+        .terminal-title {
+            color: var(--text-secondary);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            margin: 0 auto;
+            transform: translateX(-18px);
+        }
+
+        #terminal-body {
+            padding: 1.5rem;
+            max-height: 80vh;
+            overflow-y: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        #terminal-content {
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        #terminal-content .prompt {
+            color: var(--accent-positive);
+            text-shadow: 0 0 5px var(--accent-positive);
+        }
+
+        #terminal-content .command {
+            color: var(--text-primary);
+        }
+
+        #terminal-content .output {
+            color: var(--text-secondary);
+            padding: 0.5rem 0 1.5rem 0;
+            border-left: 1px solid var(--border-color);
+            padding-left: 1rem;
+            margin-left: 4px;
+        }
+        
+        #terminal-content .output ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        #terminal-content .output li {
+            margin-bottom: 0.5rem;
+        }
+        
+        #terminal-content .output strong {
+            color: var(--text-primary);
+            font-weight: normal;
+        }
+
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 1.2em;
+            background-color: var(--accent-positive);
+            animation: blink 1s infinite;
+            margin-left: 2px;
+            box-shadow: 0 0 5px var(--accent-positive);
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--background-color); }
+        ::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 5px; border: 2px solid var(--background-color); }
+        ::-webkit-scrollbar-thumb:hover { background-color: var(--text-secondary); }
+        
+        @media (max-width: 900px) {
+            .page-actions {
+                margin-left: 0;
+                align-self: stretch;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="true-background"></div>
+    <div id="background-glow"></div>
+    <div id="background-animations"></div>
+
+    <div class="faq-container">
+        <div class="page-actions">
+            <a href="/" class="back-btn">&larr; Back to Home</a>
+            <button id="read-aloud-btn" class="secondary-btn">
+                <svg id="read-aloud-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                <span id="read-aloud-text">Read Aloud</span>
+            </button>
+        </div>
+        <div id="terminal">
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <span class="dot red"></span>
+                    <span class="dot yellow"></span>
+                    <span class="dot green"></span>
+                </div>
+                <div class="terminal-title">async_tos</div>
+            </div>
+            <div id="terminal-body">
+                <div id="terminal-content">
+<span class="prompt">&gt; </span><span class="command">./tos --version</span>
+<div class="output">
+Effective Date: November 5, 2025
+</div>
+<span class="prompt">&gt; </span><span class="command">./tos --section "1. Your License to Use &lt;/async&gt;"</span>
+<div class="output">
+We grant you a personal, limited license to use our software for its intended security purpose. You cannot sell, share, or use it for commercial business.
+</div>
+<span class="prompt">&gt; </span><span class="command">./tos --section "2. What Data We Collect"</span>
+<div class="output">
+This is a security tool. By running a scan, you agree that we can collect system data (like files, user info, and threat details). This report is securely sent to our team on Discord for review.
+</div>
+<span class="prompt">&gt; </span><span class="command">./tos --section "3. Our Responsibility (or Lack Thereof)"</span>
+<div class="output">
+The software is provided "as-is." We are not responsible for any damage it might cause. We only offer refunds if the software itself is verifiably broken, not if an issue is caused by your computer or other software.
+</div>
+<span class="prompt">&gt; </span><span class="command">./tos --section "4. Rules of Conduct: What Not To Do"</span>
+<div class="output">
+- <strong>Don't Reverse Engineer:</strong> Do not try to hack, decompile, or reverse-engineer our software.
+- <strong>Don't Help Cheaters:</strong> If you are involved in making or using cheats/tools to bypass our scanner, your license will be terminated instantly. Using our software to help cheat developers will also result in a ban.
+- <strong>Don't Scan Yourself:</strong> This tool is for authorized investigation of others. Scanning your own system is a violation of this agreement.
+- <strong>Keep Reports Confidential:</strong> Scan results are private. Leaking or publicly sharing reports will result in an immediate license termination.
+- <strong>No Scan Spamming:</strong> Do not scan the same user more than twice within a one-hour period.
+- <strong>No Ban Evasion:</strong> Using alternate accounts to get around a ban will result in all your associated accounts being banned permanently.
+- <strong>Severe Violations:</strong> If you break any of these rules, we reserve the right to ban you from our Discord server permanently, with no chance for appeal.
+</div>
+<span class="prompt">&gt; </span><span class="command">./tos --section "5. Account & License Issues"</span>
+<div class="output">
+- <strong>Account Recovery:</strong> If you lose access to your account, contact us. You must provide valid proof of ownership (like a receipt) to recover your license.
+- <strong>Bans & Refunds:</strong> If you break any of these rules, we can revoke your license immediately with no refund.
+</div>
+<span class="prompt">&gt; </span><span class="command">./tos --section "6. Getting Help & Final Terms"</span>
+<div class="output">
+- <strong>Support:</strong> Have questions? Open a support ticket in our Discord. Please be respectful.
+- <strong>Changes to Terms:</strong> We can change these terms at any time. By continuing to use the software, you agree to the updated terms.
+</div>
+                </div>
+                <span class="cursor"></span>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        function createFloatingSymbols() {
+            const container = document.getElementById('background-animations');
+            if (!container) return;
+            const symbolCount = 20;
+            for (let i = 0; i < symbolCount; i++) {
+                const symbol = document.createElement('span');
+                symbol.classList.add('floating-symbol');
+                symbol.innerHTML = '&lt;/&gt;';
+                symbol.style.left = `${Math.random() * 100}vw`;
+                symbol.style.top = `${Math.random() * 100}vh`;
+                symbol.style.fontSize = `${Math.random() * 20 + 10}px`;
+                symbol.style.animationDuration = `${Math.random() * 15 + 10}s`;
+                symbol.style.animationDelay = `${Math.random() * 5}s`;
+                container.appendChild(symbol);
+            }
+        }
+        createFloatingSymbols();
+
+        // --- TTS Logic using Web Speech API ---
+        const readAloudBtn = document.getElementById('read-aloud-btn');
+        const readAloudText = document.getElementById('read-aloud-text');
+        const readAloudIcon = document.getElementById('read-aloud-icon');
+
+        const speakerIconPath = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>';
+        const stopIconPath = '<rect x="6" y="6" width="12" height="12"></rect>';
+
+        function stopPlayback() {
+            speechSynthesis.cancel();
+            readAloudText.textContent = 'Read Aloud';
+            readAloudIcon.innerHTML = speakerIconPath;
+            readAloudBtn.disabled = false;
+        }
+
+        if (readAloudBtn) {
+            if (!('speechSynthesis' in window)) {
+                readAloudBtn.disabled = true;
+                readAloudText.textContent = 'Not Supported';
+                console.warn('Browser does not support the Web Speech API.');
+            }
+
+            readAloudBtn.addEventListener('click', () => {
+                if (speechSynthesis.speaking) {
+                    stopPlayback();
+                    return;
+                }
+
+                try {
+                    readAloudText.textContent = 'Starting...';
+                    readAloudBtn.disabled = true;
+
+                    const contentEl = document.getElementById('terminal-content');
+                    if (!contentEl) throw new Error('Content not found');
+                    
+                    const elementsToRead = contentEl.querySelectorAll('.command, .output');
+                    let textToRead = Array.from(elementsToRead).map(el => {
+                        let text = el.textContent.trim();
+                        if (el.classList.contains('command')) {
+                            const match = text.match(/--section "([^"]+)"|--version/);
+                            if (match) {
+                                return match[1] || "Terms of Service";
+                            }
+                            return '';
+                        }
+                        text = text.replace(/-\s+/g, '');
+                        return text;
+                    }).filter(text => text).join('\n\n');
+
+                    if (!textToRead) {
+                        throw new Error('No text to read.');
+                    }
+                    
+                    const utterance = new SpeechSynthesisUtterance(textToRead);
+                    utterance.lang = 'en-US';
+                    utterance.rate = 1;
+                    utterance.pitch = 1;
+
+                    utterance.onstart = () => {
+                        readAloudText.textContent = 'Stop Reading';
+                        readAloudIcon.innerHTML = stopIconPath;
+                        readAloudBtn.disabled = false;
+                    };
+                    
+                    utterance.onend = () => {
+                        stopPlayback();
+                    };
+
+                    utterance.onerror = (event) => {
+                        console.error('Speech synthesis error:', event.error);
+                        showNotification('An error occurred while trying to read the text.', 'info');
+                        stopPlayback();
+                    };
+
+                    speechSynthesis.speak(utterance);
+
+                } catch (error) {
+                    console.error('Text-to-speech failed:', error);
+                    showNotification('Could not read the text aloud. Please try again later.', 'info');
+                    stopPlayback();
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

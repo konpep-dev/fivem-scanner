@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rules | </async> Scanner</title>
+    <script src="security.js"></script>
+    <script src="notifications.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700&family=JetBrains+Mono:wght@400&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #050505;
+            --bg-panel: #0a0a0a;
+            --surface-glass: rgba(20, 20, 20, 0.6);
+            --surface-glass-hover: rgba(30, 30, 30, 0.7);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --primary-glow: rgba(88, 101, 242, 0.5);
+            --accent-color: #5865F2;
+            --accent-hover: #4752C4;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --font-main: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 15% 50%, rgba(88, 101, 242, 0.08), transparent 25%), radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.05), transparent 25%);
+            min-height: 100vh;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #444;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        #app-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-glass);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+            z-index: 50;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 3rem;
+            text-shadow: 0 0 20px rgba(88, 101, 242, 0.5);
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: var(--accent-color);
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff;
+            transform: translateX(4px);
+        }
+
+        .nav-link.active {
+            background: rgba(88, 101, 242, 0.1);
+            color: #fff;
+            border-color: rgba(88, 101, 242, 0.2);
+            box-shadow: 0 0 15px rgba(88, 101, 242, 0.1);
+        }
+
+        .nav-link svg {
+            width: 20px;
+            height: 20px;
+            opacity: 0.8;
+        }
+
+        .nav-link.active svg {
+            opacity: 1;
+            color: var(--accent-color);
+        }
+
+        .dashboard {
+            flex-grow: 1;
+            overflow-y: auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 3rem;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: linear-gradient(to bottom, var(--bg-dark) 0%, rgba(5, 5, 5, 0) 100%);
+            backdrop-filter: blur(5px);
+        }
+
+        .dashboard-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #fff, #a1a1aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .dashboard-content {
+            padding: 0 3rem 3rem 3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card {
+            background: var(--surface-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .primary-btn {
+            font-family: var(--font-main);
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(88, 101, 242, 0.3);
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(88, 101, 242, 0.4);
+            background: var(--accent-hover);
+        }
+
+        .danger-btn {
+            font-family: var(--font-main);
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .danger-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--danger);
+            transform: translateY(-1px);
+        }
+
+        .tab-nav {
+            display: flex;
+            border-bottom: 1px solid var(--border-glass);
+            padding: 0 1.5rem;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 1.25rem 1rem;
+            margin-right: 1rem;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            color: #fff;
+        }
+
+        .tab-btn.active {
+            color: #fff;
+            border-bottom-color: var(--accent-color);
+        }
+
+        .tab-content {
+            padding: 2rem;
+        }
+
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-pane.active {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-section {
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .form-section h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #fff;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            color: #fff;
+            padding: 0.85rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--accent-color);
+            outline: none;
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.2);
+        }
+
+        .form-group textarea {
+            font-family: var(--font-mono);
+            min-height: 150px;
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+
+        .form-group input[type="file"] {
+            padding: 0.5rem;
+        }
+
+        .form-group input[type="file"]::file-selector-button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-option {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+        }
+
+        .checkbox-option:hover {
+            background: rgba(88, 101, 242, 0.1);
+            border-color: var(--accent-color) !important;
+        }
+
+        .checkbox-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-color);
+        }
+
+        #file-drop-zone {
+            border: 2px dashed var(--border-glass);
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        #file-drop-zone:hover {
+            border-color: var(--accent-color);
+            background: rgba(88, 101, 242, 0.05);
+            transform: scale(1.01);
+        }
+
+        #file-drop-zone.drag-over {
+            border-color: var(--accent-color);
+            background: rgba(88, 101, 242, 0.1);
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .rules-list {
+            margin-top: 2rem;
+        }
+
+        .rules-list h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-glass);
+            color: #fff;
+        }
+
+        .rules-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .rules-list-header h3 {
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
+
+        .bulk-delete-btn {
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: none;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .bulk-delete-btn.visible {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .bulk-delete-btn:hover {
+            background-color: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        .rules-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .rules-table th {
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .rules-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-glass);
+            vertical-align: middle;
+            color: var(--text-secondary);
+        }
+
+        .rules-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .rules-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+            color: #fff;
+        }
+
+        .rules-table code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            color: var(--accent-color);
+            border: 1px solid var(--border-glass);
+        }
+
+        .severity-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .severity-critical {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .severity-high {
+            background: rgba(249, 115, 22, 0.15);
+            color: #f97316;
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .severity-medium {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .severity-low {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .no-rules {
+            padding: 3rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            #app-container {
+                flex-direction: column;
+                height: auto;
+                overflow: auto;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                padding: 1rem;
+                flex-direction: row;
+                align-items: center;
+                position: sticky;
+                top: 0;
+            }
+
+            .nav-links {
+                flex-direction: row;
+                overflow-x: auto;
+            }
+
+            .dashboard-content {
+                padding: 1.5rem;
+            }
+
+            .dashboard-header {
+                padding: 1.5rem;
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .tab-nav {
+                overflow-x: auto;
+                padding: 0 1rem;
+            }
+
+            .tab-btn {
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <nav class="sidebar">
+            <div>
+                <div class="logo">&lt;<span>/</span>async&gt;</div>
+                <ul class="nav-links">
+                    <li><a href="/dashboard.html" class="nav-link" data-page="dashboard"><svg
+                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                            </svg><span>Dashboard</span></a></li>
+                    <li><a href="/scans.html" class="nav-link" data-page="scans"><svg xmlns="http://www.w3.org/2000/svg"
+                                width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <circle cx="12" cy="12" r="6"></circle>
+                                <circle cx="12" cy="12" r="2"></circle>
+                            </svg><span>Scans</span></a></li>
+                    <li><a href="/results.html" class="nav-link" data-page="results"><svg
+                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg><span>Results</span></a></li>
+                    <li><a href="/settings.html" class="nav-link" data-page="settings"><svg
+                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <line x1="4" y1="21" x2="4" y2="14"></line>
+                                <line x1="4" y1="10" x2="4" y2="3"></line>
+                                <line x1="12" y1="21" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12" y2="3"></line>
+                                <line x1="20" y1="21" x2="20" y2="16"></line>
+                                <line x1="20" y1="12" x2="20" y2="3"></line>
+                                <line x1="1" y1="14" x2="7" y2="14"></line>
+                                <line x1="9" y1="8" x2="15" y2="8"></line>
+                                <line x1="17" y1="16" x2="23" y2="16"></line>
+                            </svg><span>Settings</span></a></li>
+                    <li><a href="/rules.html" class="nav-link active" data-page="rules"><svg
+                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <line x1="8" y1="6" x2="21" y2="6"></line>
+                                <line x1="8" y1="12" x2="21" y2="12"></line>
+                                <line x1="8" y1="18" x2="21" y2="18"></line>
+                                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                            </svg><span>Rules</span></a></li>
+                    <li id="enterprise-nav-link-container" class="hidden"><a href="/enterprise.html" class="nav-link"
+                            data-page="enterprise"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="8.5" cy="7" r="4" />
+                                <path d="M20 8v6" />
+                                <path d="M23 11h-6" />
+                            </svg><span>Enterprise</span></a></li>
+                    <li id="admin-nav-link-container" class="hidden"><a href="/admin.html" class="nav-link"
+                            data-page="admin"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                <path d="M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
+                                <path d="M12 15c-2.2 0-4 1.8-4 4v1h8v-1c0-2.2-1.8-4-4-4z"></path>
+                            </svg><span>Admin</span></a></li>
+                </ul>
+            </div>
+            <a href="/logout" id="logout-btn" class="nav-link"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                    height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" x2="9" y1="12" y2="12" />
+                </svg><span>Logout</span></a>
+        </nav>
+        <main class="dashboard">
+            <header class="dashboard-header">
+                <h1>Custom Detection Rules</h1>
+            </header>
+            <section class="dashboard-content">
+                <div class="card">
+                    <div class="tab-nav">
+                        <button class="tab-btn active" data-tab="yara-rules">YARA Rules</button>
+                        <button class="tab-btn" data-tab="keywords">Keyword Filters</button>
+                        <button class="tab-btn" data-tab="hashes">File Hashes</button>
+                        <button class="tab-btn" data-tab="exe-strings">EXE String Extractor</button>
+                    </div>
+                    <div class="tab-content">
+                        <div id="yara-rules-pane" class="tab-pane active">
+                            <div class="form-section">
+                                <h3>Add New YARA Rule</h3>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="yara-name">Rule Name</label>
+                                        <input type="text" id="yara-name" placeholder="e.g., MyCustomCheat_Detection">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="yara-severity">Severity</label>
+                                        <select id="yara-severity">
+                                            <option value="Low">Low</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="High">High</option>
+                                            <option value="Critical">Critical</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="yara-content">Rule Content</label>
+                                        <textarea id="yara-content" placeholder="rule MyRule { ... }"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button class="primary-btn">Save Rule</button>
+                                </div>
+                            </div>
+                            <div class="rules-list">
+                                <h3>Existing YARA Rules</h3>
+                                <p class="no-rules">No custom YARA rules have been added yet.</p>
+                            </div>
+                        </div>
+                        <div id="keywords-pane" class="tab-pane">
+                            <div class="form-section">
+                                <h3>Add New Keyword Filter</h3>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="keyword-value">Keyword/Phrase</label>
+                                        <input type="text" id="keyword-value" placeholder="e.g., specific_cheat.dll">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="keyword-category">Category</label>
+                                        <select id="keyword-category">
+                                            <option>File Path</option>
+                                            <option>Process Name</option>
+                                            <option>Window Title</option>
+                                            <option>Browser History</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="keyword-severity">Severity</label>
+                                        <select id="keyword-severity">
+                                            <option>Low</option>
+                                            <option>Medium</option>
+                                            <option>High</option>
+                                            <option>Critical</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button class="primary-btn">Add Keyword</button>
+                                </div>
+                            </div>
+                            <div class="rules-list">
+                                <h3>Existing Keyword Filters</h3>
+                                <p class="no-rules">No custom keyword filters have been added yet.</p>
+                            </div>
+                        </div>
+                        <div id="hashes-pane" class="tab-pane">
+                            <div class="form-section">
+                                <h3>Add New File Hash</h3>
+                                <div class="form-grid">
+                                    <div class="form-group full-width">
+                                        <label for="hash-value">File Hash (SHA256)</label>
+                                        <input type="text" id="hash-value" placeholder="e.g., a1b2c3d4...">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="hash-description">Description</label>
+                                        <input type="text" id="hash-description" placeholder="e.g., Known cheat DLL">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="hash-severity">Severity</label>
+                                        <select id="hash-severity">
+                                            <option>Critical</option>
+                                            <option>High</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button class="primary-btn">Add Hash</button>
+                                </div>
+                            </div>
+                            <div class="rules-list">
+                                <h3>Existing File Hashes</h3>
+                                <p class="no-rules">No custom file hashes have been added yet.</p>
+                            </div>
+                        </div>
+                        <div id="exe-strings-pane" class="tab-pane">
+                            <div class="form-section">
+                                <h3>🔍 Analyze & Extract from EXE</h3>
+                                <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">
+                                    Upload an .exe file to extract strings, hashes, and automatically generate a YARA
+                                    rule.
+                                </p>
+                                <div class="form-grid">
+                                    <div class="form-group full-width">
+                                        <label>Select EXE File</label>
+                                        <div id="file-drop-zone">
+                                            <input type="file" id="exe-file" accept=".exe,.dll" style="display: none;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round"
+                                                style="color: var(--discord-blurple); margin: 0 auto 1rem;">
+                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                <polyline points="17 8 12 3 7 8"></polyline>
+                                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                                            </svg>
+                                            <div id="file-drop-text">
+                                                <p
+                                                    style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                                                    Click to upload or drag and drop</p>
+                                                <p style="font-size: 0.9rem; color: var(--text-secondary);">EXE or DLL
+                                                    files only</p>
+                                            </div>
+                                            <div id="file-selected" style="display: none;">
+                                                <p
+                                                    style="font-weight: 600; color: var(--accent-positive); margin-bottom: 0.5rem;">
+                                                    ✓ File selected</p>
+                                                <p id="selected-file-name"
+                                                    style="font-size: 0.9rem; color: var(--text-secondary);"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="exe-min-length">Minimum String Length</label>
+                                        <input type="number" id="exe-min-length" value="8" min="4" max="50">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="exe-severity">Severity</label>
+                                        <select id="exe-severity">
+                                            <option value="Low">Low</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="High" selected>High</option>
+                                            <option value="Critical">Critical</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label style="font-weight: 600; margin-bottom: 0.75rem;">What to add to Custom
+                                            Rules:</label>
+                                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                            <label
+                                                style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.75rem; border-radius: 6px; transition: all 0.2s ease;"
+                                                class="checkbox-option">
+                                                <input type="checkbox" id="add-strings" checked
+                                                    style="width: auto; cursor: pointer;">
+                                                <span style="font-weight: 500;">Strings (as Keywords)</span>
+                                            </label>
+                                            <label
+                                                style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.75rem; border-radius: 6px; transition: all 0.2s ease;"
+                                                class="checkbox-option">
+                                                <input type="checkbox" id="add-hashes" checked
+                                                    style="width: auto; cursor: pointer;">
+                                                <span style="font-weight: 500;">File Hashes (SHA256 & MD5)</span>
+                                            </label>
+                                            <label
+                                                style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.75rem; border-radius: 6px; transition: all 0.2s ease;"
+                                                class="checkbox-option">
+                                                <input type="checkbox" id="add-yara" checked
+                                                    style="width: auto; cursor: pointer;">
+                                                <span style="font-weight: 500;">Auto-Generated YARA Rule</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button class="primary-btn" id="extract-strings-btn">Analyze & Extract</button>
+                                </div>
+                            </div>
+                            <div id="extracted-data-preview" class="form-section"
+                                style="display: none; margin-top: 1.5rem;">
+                                <h3>Extraction Results</h3>
+                                <div id="file-info-section"
+                                    style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+                                    <h4 style="margin-bottom: 0.75rem; font-size: 1rem;">File Information</h4>
+                                    <div
+                                        style="display: grid; grid-template-columns: 150px 1fr; gap: 0.5rem; font-size: 0.9rem;">
+                                        <span style="color: var(--text-secondary);">Filename:</span><code
+                                            id="file-name"></code>
+                                        <span style="color: var(--text-secondary);">SHA256:</span><code id="file-sha256"
+                                            style="word-break: break-all;"></code>
+                                        <span style="color: var(--text-secondary);">MD5:</span><code
+                                            id="file-md5"></code>
+                                        <span style="color: var(--text-secondary);">File Size:</span><span
+                                            id="file-size"></span>
+                                    </div>
+                                </div>
+                                <div id="strings-section" style="margin-bottom: 1rem;">
+                                    <h4 style="margin-bottom: 0.75rem; font-size: 1rem;">Extracted Strings (<span
+                                            id="strings-count">0</span>)</h4>
+                                    <div
+                                        style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 6px; max-height: 300px; overflow-y: auto; font-family: 'Roboto Mono', monospace; font-size: 0.85rem;">
+                                        <div id="strings-list"></div>
+                                    </div>
+                                </div>
+                                <div id="yara-section" style="margin-bottom: 1rem;">
+                                    <h4 style="margin-bottom: 0.75rem; font-size: 1rem;">Auto-Generated YARA Rule</h4>
+                                    <pre
+                                        style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 6px; overflow-x: auto; font-family: 'Roboto Mono', monospace; font-size: 0.85rem;"><code id="yara-rule-preview"></code></pre>
+                                </div>
+                                <div
+                                    style="color: var(--success); font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                                    <span id="added-summary">Rules added successfully!</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script type="module">
+        import { checkAuth, setupSharedLayout, applyCachedAuth } from './security.js';
+        import { showNotification } from './notifications.js';
+
+        // Helper to escape HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Load rules function
+        const loadRules = async () => {
+            try {
+                const response = await fetch('/api/custom-rules');
+                if (!response.ok) throw new Error('Failed to load rules');
+
+                const rules = await response.json();
+
+                // Populate YARA rules
+                const yaraRules = rules.filter(r => r.rule_type === 'yara');
+                const yaraContainer = document.querySelector('#yara-rules-pane .rules-list');
+
+                if (yaraRules.length === 0) {
+                    yaraContainer.innerHTML = '<h3>Existing YARA Rules</h3><p class="no-rules">No custom YARA rules have been added yet.</p>';
+                } else {
+                    let html = '<h3>Existing YARA Rules</h3><table class="rules-table"><thead><tr><th><input type="checkbox" id="select-all-yara"></th><th>Name</th><th>Severity</th><th>Actions</th></tr></thead><tbody>';
+                    yaraRules.forEach(rule => {
+                        const severityClass = `severity-${rule.severity.toLowerCase()}`;
+                        html += `
+                            <tr>
+                                <td><input type="checkbox" class="rule-checkbox" data-id="${rule.id}"></td>
+                                <td>${escapeHtml(rule.name)}</td>
+                                <td><span class="severity-badge ${severityClass}">${rule.severity}</span></td>
+                                <td><button class="danger-btn" onclick="deleteRule(${rule.id})">Delete</button></td>
+                            </tr>
+                        `;
+                    });
+                    html += '</tbody></table><div class="bulk-actions"><button id="bulk-delete-yara" class="bulk-delete-btn">Delete Selected</button></div>';
+                    yaraContainer.innerHTML = html;
+                    setupBulkDelete('yara');
+                }
+
+                // Populate Keywords
+                const keywords = rules.filter(r => r.rule_type === 'keyword');
+                const keywordsContainer = document.querySelector('#keywords-pane .rules-list');
+
+                if (keywords.length === 0) {
+                    keywordsContainer.innerHTML = '<h3>Existing Keyword Filters</h3><p class="no-rules">No custom keyword filters have been added yet.</p>';
+                } else {
+                    let html = '<h3>Existing Keyword Filters</h3><table class="rules-table"><thead><tr><th><input type="checkbox" id="select-all-keywords"></th><th>Keyword</th><th>Category</th><th>Severity</th><th>Actions</th></tr></thead><tbody>';
+                    keywords.forEach(rule => {
+                        const severityClass = `severity-${rule.severity.toLowerCase()}`;
+                        html += `
+                            <tr>
+                                <td><input type="checkbox" class="rule-checkbox" data-id="${rule.id}"></td>
+                                <td><code>${escapeHtml(rule.content)}</code></td>
+                                <td>${escapeHtml(rule.category || 'General')}</td>
+                                <td><span class="severity-badge ${severityClass}">${rule.severity}</span></td>
+                                <td><button class="danger-btn" onclick="deleteRule(${rule.id})">Delete</button></td>
+                            </tr>
+                        `;
+                    });
+                    html += '</tbody></table><div class="bulk-actions"><button id="bulk-delete-keywords" class="bulk-delete-btn">Delete Selected</button></div>';
+                    keywordsContainer.innerHTML = html;
+                    setupBulkDelete('keywords');
+                }
+
+                // Populate Hashes
+                const hashes = rules.filter(r => r.rule_type === 'hash');
+                const hashesContainer = document.querySelector('#hashes-pane .rules-list');
+
+                if (hashes.length === 0) {
+                    hashesContainer.innerHTML = '<h3>Existing File Hashes</h3><p class="no-rules">No custom file hashes have been added yet.</p>';
+                } else {
+                    let html = '<h3>Existing File Hashes</h3><table class="rules-table"><thead><tr><th><input type="checkbox" id="select-all-hashes"></th><th>Hash</th><th>Description</th><th>Severity</th><th>Actions</th></tr></thead><tbody>';
+                    hashes.forEach(rule => {
+                        const severityClass = `severity-${rule.severity.toLowerCase()}`;
+                        html += `
+                            <tr>
+                                <td><input type="checkbox" class="rule-checkbox" data-id="${rule.id}"></td>
+                                <td><code title="${escapeHtml(rule.content)}">${escapeHtml(rule.content.substring(0, 16))}...</code></td>
+                                <td>${escapeHtml(rule.description || '-')}</td>
+                                <td><span class="severity-badge ${severityClass}">${rule.severity}</span></td>
+                                <td><button class="danger-btn" onclick="deleteRule(${rule.id})">Delete</button></td>
+                            </tr>
+                        `;
+                    });
+                    html += '</tbody></table><div class="bulk-actions"><button id="bulk-delete-hashes" class="bulk-delete-btn">Delete Selected</button></div>';
+                    hashesContainer.innerHTML = html;
+                    setupBulkDelete('hashes');
+                }
+
+            } catch (error) {
+                console.error('Error loading rules:', error);
+                showNotification('Error loading rules', 'error');
+            }
+        };
+
+        // Expose deleteRule globally
+        window.deleteRule = async (id) => {
+            if (!confirm('Are you sure you want to delete this rule?')) return;
+
+            try {
+                const response = await fetch(`/api/custom-rules/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showNotification('Rule deleted successfully', 'success');
+                    loadRules();
+                } else {
+                    showNotification('Failed to delete rule', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting rule:', error);
+                showNotification('Error deleting rule', 'error');
+            }
+        };
+
+        // Bulk delete setup
+        const setupBulkDelete = (type) => {
+            const containerId = type === 'yara' ? 'yara-rules-pane' : (type === 'keywords' ? 'keywords-pane' : 'hashes-pane');
+            const container = document.getElementById(containerId);
+            const selectAll = container.querySelector(`input[id^="select-all"]`);
+            const checkboxes = container.querySelectorAll('.rule-checkbox');
+            const deleteBtn = container.querySelector('.bulk-delete-btn');
+
+            if (!selectAll) return;
+
+            const updateButtonState = () => {
+                const checked = container.querySelectorAll('.rule-checkbox:checked');
+                if (checked.length > 0) {
+                    deleteBtn.classList.add('visible');
+                    deleteBtn.textContent = `Delete Selected (${checked.length})`;
+                } else {
+                    deleteBtn.classList.remove('visible');
+                }
+            };
+
+            selectAll.addEventListener('change', (e) => {
+                checkboxes.forEach(cb => cb.checked = e.target.checked);
+                updateButtonState();
+            });
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    updateButtonState();
+                    selectAll.checked = Array.from(checkboxes).every(c => c.checked);
+                });
+            });
+
+            deleteBtn.onclick = async () => {
+                const checked = container.querySelectorAll('.rule-checkbox:checked');
+                if (checked.length === 0) return;
+
+                if (!confirm(`Are you sure you want to delete ${checked.length} rules?`)) return;
+
+                const ids = Array.from(checked).map(cb => parseInt(cb.dataset.id));
+                await bulkDeleteRules(ids);
+            };
+        };
+
+        const bulkDeleteRules = async (ids) => {
+            try {
+                // Since there might not be a bulk delete API, we'll do it sequentially or concurrently
+                // Ideally the backend should support bulk delete. For now, let's assume we loop.
+                // Or if there is a bulk endpoint, use it. Assuming loop for safety as I don't see bulk endpoint in summary.
+
+                // Actually, let's try to do it concurrently
+                const promises = ids.map(id => fetch(`/api/custom-rules/${id}`, { method: 'DELETE' }));
+                await Promise.all(promises);
+
+                showNotification('Rules deleted successfully', 'success');
+                loadRules();
+            } catch (error) {
+                console.error('Error bulk deleting rules:', error);
+                showNotification('Error deleting rules', 'error');
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            applyCachedAuth();
+            const user = await checkAuth();
+            if (user) {
+                setupSharedLayout(user);
+
+                // Tab switching
+                const tabNav = document.querySelector('.tab-nav');
+                const tabButtons = tabNav.querySelectorAll('.tab-btn');
+                const tabPanes = document.querySelectorAll('.tab-pane');
+
+                tabNav.addEventListener('click', (e) => {
+                    const targetButton = e.target.closest('.tab-btn');
+                    if (!targetButton) return;
+
+                    const tabId = targetButton.dataset.tab;
+
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    targetButton.classList.add('active');
+
+                    tabPanes.forEach(pane => pane.classList.remove('active'));
+                    document.getElementById(`${tabId}-pane`).classList.add('active');
+                });
+
+                // Load existing rules
+                loadRules();
+
+                // Keyword form
+                document.querySelector('#keywords-pane .primary-btn').addEventListener('click', async () => {
+                    const keyword = document.getElementById('keyword-value').value.trim();
+                    const category = document.getElementById('keyword-category').value;
+                    const severity = document.getElementById('keyword-severity').value;
+
+                    if (!keyword) {
+                        showNotification('Please enter a keyword', 'warning');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/api/custom-rules', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                rule_type: 'keyword',
+                                name: `Keyword: ${keyword}`,
+                                content: keyword,
+                                severity: severity,
+                                category: category
+                            })
+                        });
+
+                        if (response.ok) {
+                            showNotification('Keyword added successfully', 'success');
+                            document.getElementById('keyword-value').value = '';
+                            loadRules();
+                        } else {
+                            const error = await response.json();
+                            showNotification(error.error || 'Failed to add keyword', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error adding keyword:', error);
+                        showNotification('Error adding keyword', 'error');
+                    }
+                });
+
+                // Hash form
+                document.querySelector('#hashes-pane .primary-btn').addEventListener('click', async () => {
+                    const hash = document.getElementById('hash-value').value.trim().toUpperCase();
+                    const description = document.getElementById('hash-description').value.trim();
+                    const severity = document.getElementById('hash-severity').value;
+
+                    if (!hash) {
+                        showNotification('Please enter a file hash', 'warning');
+                        return;
+                    }
+
+                    if (hash.length !== 64) {
+                        showNotification('Please enter a valid SHA256 hash (64 characters)', 'warning');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/api/custom-rules', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                rule_type: 'hash',
+                                name: `Hash: ${hash.substring(0, 16)}...`,
+                                content: hash,
+                                severity: severity,
+                                description: description
+                            })
+                        });
+
+                        if (response.ok) {
+                            showNotification('Hash added successfully', 'success');
+                            document.getElementById('hash-value').value = '';
+                            document.getElementById('hash-description').value = '';
+                            loadRules();
+                        } else {
+                            const error = await response.json();
+                            showNotification(error.error || 'Failed to add hash', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error adding hash:', error);
+                        showNotification('Error adding hash', 'error');
+                    }
+                });
+
+                // YARA form
+                document.querySelector('#yara-rules-pane .primary-btn').addEventListener('click', async () => {
+                    const name = document.getElementById('yara-name').value.trim();
+                    const content = document.getElementById('yara-content').value.trim();
+                    const severity = document.getElementById('yara-severity').value;
+
+                    if (!name || !content) {
+                        showNotification('Please enter rule name and content', 'warning');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/api/custom-rules', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                rule_type: 'yara',
+                                name: name,
+                                content: content,
+                                severity: severity
+                            })
+                        });
+
+                        if (response.ok) {
+                            showNotification('YARA rule added successfully', 'success');
+                            document.getElementById('yara-name').value = '';
+                            document.getElementById('yara-content').value = '';
+                            loadRules();
+                        } else {
+                            const error = await response.json();
+                            showNotification(error.error || 'Failed to add YARA rule', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error adding YARA rule:', error);
+                        showNotification('Error adding YARA rule', 'error');
+                    }
+                });
+
+                // File drop zone functionality
+                const fileInput = document.getElementById('exe-file');
+                const dropZone = document.getElementById('file-drop-zone');
+                const fileDropText = document.getElementById('file-drop-text');
+                const fileSelected = document.getElementById('file-selected');
+                const selectedFileName = document.getElementById('selected-file-name');
+
+                // Click to upload
+                dropZone.addEventListener('click', () => {
+                    fileInput.click();
+                });
+
+                // File selected via input
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        const file = e.target.files[0];
+                        fileDropText.style.display = 'none';
+                        fileSelected.style.display = 'block';
+                        selectedFileName.textContent = file.name;
+                    }
+                });
+
+                // Drag and drop events
+                dropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('drag-over');
+                });
+
+                dropZone.addEventListener('dragleave', () => {
+                    dropZone.classList.remove('drag-over');
+                });
+
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('drag-over');
+
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        const file = files[0];
+                        if (file.name.toLowerCase().endsWith('.exe') || file.name.toLowerCase().endsWith('.dll')) {
+                            fileInput.files = files;
+                            fileDropText.style.display = 'none';
+                            fileSelected.style.display = 'block';
+                            selectedFileName.textContent = file.name;
+                        } else {
+                            showNotification('Please select an EXE or DLL file', 'warning');
+                        }
+                    }
+                });
+
+                // EXE Analysis & Extraction
+                document.getElementById('extract-strings-btn').addEventListener('click', async () => {
+                    const fileInput = document.getElementById('exe-file');
+                    const minLength = parseInt(document.getElementById('exe-min-length').value);
+                    const severity = document.getElementById('exe-severity').value;
+                    const addStrings = document.getElementById('add-strings').checked;
+                    const addHashes = document.getElementById('add-hashes').checked;
+                    const addYara = document.getElementById('add-yara').checked;
+
+                    if (!fileInput.files || fileInput.files.length === 0) {
+                        showNotification('Please select an EXE file', 'warning');
+                        return;
+                    }
+
+                    if (!addStrings && !addHashes && !addYara) {
+                        showNotification('Please select at least one option to add', 'warning');
+                        return;
+                    }
+
+                    const file = fileInput.files[0];
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('min_length', minLength);
+                    formData.append('severity', severity);
+                    formData.append('add_strings', addStrings);
+                    formData.append('add_hashes', addHashes);
+                    formData.append('add_yara', addYara);
+
+                    const btn = document.getElementById('extract-strings-btn');
+                    btn.disabled = true;
+                    btn.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; vertical-align: middle; margin-right: 0.5rem; animation: spin 1s linear infinite;">
+                            <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                        </svg>
+                        Analyzing...
+                    `;
+
+                    try {
+                        const response = await fetch('/api/extract-exe-strings', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json();
+
+                            // Show preview
+                            const previewDiv = document.getElementById('extracted-data-preview');
+
+                            // File info
+                            document.getElementById('file-name').textContent = file.name;
+                            document.getElementById('file-sha256').textContent = result.sha256;
+                            document.getElementById('file-md5').textContent = result.md5;
+                            document.getElementById('file-size').textContent = (file.size / 1024).toFixed(2) + ' KB';
+
+                            // Strings
+                            const stringsList = document.getElementById('strings-list');
+                            const stringsCount = document.getElementById('strings-count');
+                            stringsList.innerHTML = result.strings.map(s =>
+                                `<div style="padding: 0.25rem 0; border-bottom: 1px solid var(--border-glass);">${escapeHtml(s)}</div>`
+                            ).join('');
+                            stringsCount.textContent = result.strings.length;
+
+                            // YARA rule
+                            if (result.yara_rule) {
+                                document.getElementById('yara-rule-preview').textContent = result.yara_rule;
+                            }
+
+                            // Summary
+                            const summary = [];
+                            if (result.strings_added > 0) summary.push(`${result.strings_added} strings`);
+                            if (result.hashes_added > 0) summary.push(`${result.hashes_added} hashes`);
+                            if (result.yara_added > 0) summary.push(`${result.yara_added} YARA rule`);
+
+                            document.getElementById('added-summary').textContent =
+                                `Successfully added: ${summary.join(', ')}`;
+
+                            previewDiv.style.display = 'block';
+
+                            showNotification(`Analysis complete! Added ${result.total_added} custom rules`, 'success');
+                            loadRules();
+
+                            // Reset form
+                            fileInput.value = '';
+                            fileDropText.style.display = 'block';
+                            fileSelected.style.display = 'none';
+                        } else {
+                            const error = await response.json();
+                            showNotification(error.error || 'Failed to analyze file', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error analyzing file:', error);
+                        showNotification('Error analyzing file', 'error');
+                    } finally {
+                        btn.disabled = false;
+                        btn.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; vertical-align: middle; margin-right: 0.5rem;">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                                <path d="M11 8a3 3 0 0 1 3 3"></path>
+                            </svg>
+                            Analyze & Extract
+                        `;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

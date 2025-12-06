@@ -1,0 +1,621 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Results | </async> Scanner</title>
+  <script src="security.js"></script>
+  <script src="notifications.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700&family=JetBrains+Mono:wght@400&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #050505;
+      --bg-panel: #0a0a0a;
+      --surface-glass: rgba(20, 20, 20, 0.6);
+      --surface-glass-hover: rgba(30, 30, 30, 0.7);
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --text-primary: #ffffff;
+      --text-secondary: #a1a1aa;
+      --primary-glow: rgba(88, 101, 242, 0.5);
+      --accent-color: #5865F2;
+      --accent-hover: #4752C4;
+      --success: #10B981;
+      --danger: #EF4444;
+      --warning: #F59E0B;
+      --font-main: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(circle at 15% 50%, rgba(88, 101, 242, 0.08), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.05), transparent 25%);
+      min-height: 100vh;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #333;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #444;
+    }
+
+    /* Layout */
+    #app-container {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    /* Sidebar - Glassy & Sleek */
+    .sidebar {
+      width: 260px;
+      background: rgba(10, 10, 10, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-right: 1px solid var(--border-glass);
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-shrink: 0;
+      z-index: 50;
+    }
+
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 3rem;
+      text-shadow: 0 0 20px rgba(88, 101, 242, 0.5);
+      letter-spacing: 1px;
+    }
+
+    .logo span {
+      color: var(--accent-color);
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid transparent;
+    }
+
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.03);
+      color: #fff;
+      transform: translateX(4px);
+    }
+
+    .nav-link.active {
+      background: rgba(88, 101, 242, 0.1);
+      color: #fff;
+      border-color: rgba(88, 101, 242, 0.2);
+      box-shadow: 0 0 15px rgba(88, 101, 242, 0.1);
+    }
+
+    .nav-link svg {
+      width: 20px;
+      height: 20px;
+      opacity: 0.8;
+    }
+
+    .nav-link.active svg {
+      opacity: 1;
+      color: var(--accent-color);
+    }
+
+    /* Main Content */
+    .dashboard {
+      flex-grow: 1;
+      overflow-y: auto;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2rem 3rem;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: linear-gradient(to bottom, var(--bg-dark) 0%, rgba(5, 5, 5, 0) 100%);
+      backdrop-filter: blur(5px);
+    }
+
+    .dashboard-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(to right, #fff, #a1a1aa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .dashboard-content {
+      padding: 0 3rem 3rem 3rem;
+    }
+
+    /* Results List Card */
+    .card {
+      background: var(--surface-glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-glass);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .results-list-card {
+      padding: 0;
+    }
+
+    #no-results-message {
+      padding: 3rem;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+
+    .result-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border-glass);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .result-item:last-child {
+      border-bottom: none;
+    }
+
+    .result-item:hover {
+      background: rgba(255, 255, 255, 0.02);
+      padding-left: 2.5rem;
+    }
+
+    .result-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .result-pin {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #fff;
+    }
+
+    .result-time {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .result-action {
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+
+    .result-item:hover .result-action {
+      opacity: 1;
+      color: var(--accent-color);
+      transform: translateX(0);
+    }
+
+    .status-badge {
+      padding: 0.35rem 0.85rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-badge.clean {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.1);
+    }
+
+    .status-badge.threats {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+      }
+    }
+
+    .loader-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem;
+      gap: 1rem;
+      color: var(--text-secondary);
+    }
+
+    .loader {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--accent-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      #app-container {
+        flex-direction: column;
+        height: auto;
+        overflow: auto;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        padding: 1rem;
+        flex-direction: row;
+        align-items: center;
+        position: sticky;
+        top: 0;
+      }
+
+      .nav-links {
+        flex-direction: row;
+        overflow-x: auto;
+      }
+
+      .dashboard-content {
+        padding: 1.5rem;
+      }
+
+      .dashboard-header {
+        padding: 1.5rem;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+
+      .result-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .result-action {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app-container">
+    <nav class="sidebar">
+      <div>
+        <div class="logo">
+          &lt;<span>/</span>async&gt;
+        </div>
+        <ul class="nav-links">
+          <li><a href="/dashboard.html" class="nav-link" data-page="dashboard">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+              <span>Dashboard</span>
+            </a></li>
+          <li><a href="/scans.html" class="nav-link" data-page="scans">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="6"></circle>
+                <circle cx="12" cy="12" r="2"></circle>
+              </svg>
+              <span>Scans</span>
+            </a></li>
+          <li><a href="/results.html" class="nav-link active" data-page="results">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              <span>Results</span>
+            </a></li>
+          <li><a href="/settings.html" class="nav-link" data-page="settings">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" y1="21" x2="4" y2="14"></line>
+                <line x1="4" y1="10" x2="4" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12" y2="3"></line>
+                <line x1="20" y1="21" x2="20" y2="16"></line>
+                <line x1="20" y1="12" x2="20" y2="3"></line>
+                <line x1="1" y1="14" x2="7" y2="14"></line>
+                <line x1="9" y1="8" x2="15" y2="8"></line>
+                <line x1="17" y1="16" x2="23" y2="16"></line>
+              </svg>
+              <span>Settings</span>
+            </a></li>
+          <li><a href="/rules.html" class="nav-link" data-page="rules">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+              </svg>
+              <span>Rules</span>
+            </a></li>
+          <li id="enterprise-nav-link-container" class="hidden"><a href="/enterprise.html" class="nav-link"
+              data-page="enterprise">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="8.5" cy="7" r="4" />
+                <path d="M20 8v6" />
+                <path d="M23 11h-6" />
+              </svg>
+              <span>Enterprise</span>
+            </a></li>
+          <li id="admin-nav-link-container" class="hidden"><a href="/admin.html" class="nav-link" data-page="admin">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <path d="M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
+                <path d="M12 15c-2.2 0-4 1.8-4 4v1h8v-1c0-2.2-1.8-4-4-4z"></path>
+              </svg>
+              <span>Admin</span>
+            </a></li>
+        </ul>
+      </div>
+      <a href="/logout" id="logout-btn" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" x2="9" y1="12" y2="12" />
+        </svg>
+        <span>Logout</span>
+      </a>
+    </nav>
+    <main class="dashboard">
+      <header class="dashboard-header">
+        <h1>Scan Results</h1>
+      </header>
+      <section class="dashboard-content">
+        <div class="card results-list-card">
+          <div id="results-list">
+            <div class="loader-container">
+              <div class="loader"></div>
+              <p>Loading Results...</p>
+            </div>
+          </div>
+          <p id="no-results-message" class="hidden">No completed scans found.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    let currentUser = null;
+    const resultsListEl = document.getElementById('results-list');
+    const noResultsMessageEl = document.getElementById('no-results-message');
+
+    function applyCachedAuth() {
+      try {
+        const cachedUser = sessionStorage.getItem('currentUser');
+        if (cachedUser) {
+          const user = JSON.parse(cachedUser);
+          if (user.role === 'admin') {
+            document.getElementById('admin-nav-link-container').classList.remove('hidden');
+          }
+          if (user.is_enterprise_admin) {
+            document.getElementById('enterprise-nav-link-container').classList.remove('hidden');
+          }
+        }
+      } catch (e) {
+        console.warn('Could not apply cached auth state.', e);
+        sessionStorage.removeItem('currentUser');
+      }
+    }
+
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/user');
+        if (!response.ok) {
+          window.location.href = '/index.html';
+          return null;
+        }
+        const userData = await response.json();
+        sessionStorage.setItem('currentUser', JSON.stringify(userData));
+        if (userData.is_banned || !userData.has_license) {
+          window.location.href = '/unlicensed.html';
+          return null;
+        }
+        currentUser = userData;
+        return userData;
+      } catch (error) {
+        console.error("Auth check failed:", error);
+        window.location.href = '/index.html';
+        return null;
+      }
+    }
+
+    function setupSharedLayout(user) {
+      if (user && user.role === 'admin') {
+        document.getElementById('admin-nav-link-container').classList.remove('hidden');
+      }
+      if (user && user.is_enterprise_admin) {
+        document.getElementById('enterprise-nav-link-container').classList.remove('hidden');
+      }
+      document.getElementById('logout-btn').addEventListener('click', e => {
+        e.preventDefault();
+        window.location.href = '/logout';
+      });
+    }
+
+    function formatDate(isoString) {
+      if (!isoString) return 'N/A';
+      try {
+        return new Date(isoString).toLocaleString();
+      } catch (e) {
+        return isoString;
+      }
+    }
+
+    function renderResults(scans) {
+      if (!resultsListEl || !noResultsMessageEl) return;
+
+      if (scans.length === 0) {
+        noResultsMessageEl.classList.remove('hidden');
+        resultsListEl.innerHTML = '';
+      } else {
+        noResultsMessageEl.classList.add('hidden');
+        resultsListEl.innerHTML = scans.map(scan => {
+          let statusHTML;
+          if (scan.status === 'Cheats Detected') {
+            const threatText = scan.critical_count > 0
+              ? `${scan.critical_count} Critical Threat${scan.critical_count > 1 ? 's' : ''}`
+              : 'Threats Found';
+            statusHTML = `<span class="status-badge threats">${threatText}</span>`;
+          } else {
+            statusHTML = `<span class="status-badge clean">Clean</span>`;
+          }
+
+          return `
+                    <a href="/report?id=${scan.id}" class="result-item">
+                        <div class="result-info">
+                            <span class="result-pin">PIN: ${scan.pin}</span>
+                            <span class="result-time">${formatDate(scan.timestamp)}</span>
+                        </div>
+                        <div class="result-status">
+                            ${statusHTML}
+                        </div>
+                        <div class="result-action">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
+                    </a>
+                `;
+        }).join('');
+      }
+    }
+
+    async function fetchAndRenderResults() {
+      try {
+        const response = await fetch('/api/scans');
+        if (!response.ok) throw new Error('Failed to fetch scan results.');
+        const allScans = await response.json();
+
+        const completedScans = allScans.filter(scan =>
+          scan.status === 'Cheats Detected' || scan.status === 'No threats found'
+        );
+
+        renderResults(completedScans);
+
+      } catch (error) {
+        console.error('Error loading results:', error);
+        resultsListEl.innerHTML = `<p style="color: var(--accent-negative); padding: 1.5rem; text-align: center;">Error: Could not load scan results.</p>`;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      applyCachedAuth();
+      const user = await checkAuth();
+      if (user) {
+        setupSharedLayout(user);
+        fetchAndRenderResults();
+      }
+    });
+  </script>
+</body>
+
+</html>

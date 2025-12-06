@@ -1,0 +1,371 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>License Required | </async> Scanner</title>
+    <script src="security.js"></script>
+  <script src="notifications.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --background-color: #0A0A0A;
+            --surface-color: #141414;
+            --border-color: #2A2A2A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+            --accent-negative: #EF4444;
+            --discord-blurple: #5865F2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow: hidden;
+        }
+
+        #background-glow {
+            content: '';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 150vw;
+            height: 150vh;
+            max-width: 1200px;
+            max-height: 1200px;
+            background-image: radial-gradient(circle, rgba(88, 101, 242, 0.2), transparent 50%);
+            transform: translate(-50%, -50%);
+            animation: pulse 8s infinite ease-in-out;
+            z-index: -2;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(0.9);
+                opacity: 0.7;
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(0.9);
+                opacity: 0.7;
+            }
+        }
+
+        #background-animations {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .floating-symbol {
+            position: absolute;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7), 0 0 20px rgba(255, 255, 255, 0.5);
+            opacity: 0.1;
+            user-select: none;
+            animation: float infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            25% {
+                transform: translate(20px, 40px) rotate(15deg);
+            }
+
+            50% {
+                transform: translate(-30px, -10px) rotate(-5deg);
+            }
+
+            75% {
+                transform: translate(10px, -50px) rotate(10deg);
+            }
+
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+        }
+
+        #unlicensed-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100vh;
+            text-align: center;
+            padding: 2rem;
+            z-index: 1;
+        }
+
+        .content-box {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 3rem 4rem;
+            max-width: 600px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .error-icon {
+            color: var(--accent-negative);
+            margin-bottom: 2rem;
+            animation: pulse-icon 2s infinite;
+            display: flex;
+            justify-content: center;
+        }
+
+        @keyframes pulse-icon {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.7;
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+        }
+
+        .logo span {
+            color: var(--text-secondary);
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            letter-spacing: -1px;
+            margin-bottom: 1rem;
+        }
+
+        .message {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+        }
+
+        .primary-btn {
+            background-color: var(--discord-blurple);
+            color: var(--text-primary);
+            border: none;
+            padding: 0.85rem 1.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Inter', sans-serif;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(88, 101, 242, 0.3);
+        }
+
+        .primary-btn:hover {
+            background-color: #4752C4;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(88, 101, 242, 0.4);
+        }
+
+        .logout-link {
+            margin-top: 2.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+
+        .logout-link:hover {
+            color: var(--text-primary);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="background-glow"></div>
+    <div id="background-animations"></div>
+
+    <div id="unlicensed-container">
+        <div class="content-box">
+            <div class="error-icon">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
+                    <path d="M15 9l-6 6M9 9l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+            </div>
+            <div class="logo">
+                &lt;<span>/</span>async&gt;
+            </div>
+            <h1 class="title">License Required</h1>
+            <p class="message">
+                Your account does not have a license to access the &lt;/async&gt; Scanner dashboard. Please join our
+                Discord server to request access.
+            </p>
+            <a href="https://discord.gg/asyncscanner" id="discord-btn" class="primary-btn" target="_blank"
+                rel="noopener noreferrer">
+                <svg width="24" height="24" viewBox="0 -20 256 256" fill="currentColor" version="1.1"
+                    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                    preserveAspectRatio="xMidYMid">
+                    <g>
+                        <path
+                            d="M216.856339,16.5966031 C200.285002,8.84328665 182.566144,3.2084988 164.041564,0 C161.766523,4.11318106 159.108624,9.64549908 157.276099,14.0464379 C137.583995,11.0849896 118.072967,11.0849896 98.7430163,14.0464379 C96.9108417,9.64549908 94.1925838,4.11318106 91.8971895,0 C73.3526068,3.2084988 55.6133949,8.86399117 39.0420583,16.6376612 C5.61752293,67.146514 -3.4433191,116.400813 1.08711069,164.955721 C23.2560196,181.510915 44.7403634,191.567697 65.8621325,198.148576 C71.0772151,190.971126 75.7283628,183.341335 79.7352139,175.300261 C72.104019,172.400575 64.7949724,168.822202 57.8887866,164.667963 C59.7209612,163.310589 61.5131304,161.891452 63.2445898,160.431257 C105.36741,180.133187 151.134928,180.133187 192.754523,160.431257 C194.506336,161.891452 196.298154,163.310589 198.110326,164.667963 C191.183787,168.842556 183.854737,172.420929 176.223542,175.320965 C180.230393,183.341335 184.861538,190.991831 190.096624,198.16893 C211.238746,191.588051 232.743023,181.531619 254.911949,164.955721 C260.227747,108.668201 245.831087,59.8662432 216.856339,16.5966031 Z M85.4738752,135.09489 C72.8290281,135.09489 62.4592217,123.290155 62.4592217,108.914901 C62.4592217,94.5396472 72.607595,82.7145587 85.4738752,82.7145587 C98.3405064,82.7145587 108.709962,94.5189427 108.488529,108.914901 C108.508531,123.290155 98.3405064,135.09489 85.4738752,135.09489 Z M170.525237,135.09489 C157.88039,135.09489 147.510584,123.290155 147.510584,108.914901 C147.510584,94.5396472 157.658606,82.7145587 170.525237,82.7145587 C183.391518,82.7145587 193.761324,94.5189427 193.539891,108.914901 C193.539891,123.290155 183.391518,135.09489 170.525237,135.09489 Z">
+                        </path>
+                    </g>
+                </svg>
+                Join Discord Server
+            </a>
+        </div>
+        <a href="/logout" class="logout-link">Logout</a>
+    </div>
+
+    <script type="module">
+        function createFloatingSymbols() {
+            const container = document.getElementById('background-animations');
+            if (!container) return;
+            const symbolCount = 20;
+            for (let i = 0; i < symbolCount; i++) {
+                const symbol = document.createElement('span');
+                symbol.classList.add('floating-symbol');
+                symbol.innerHTML = '&lt;/&gt;';
+                symbol.style.left = `${Math.random() * 100}vw`;
+                symbol.style.top = `${Math.random() * 100}vh`;
+                symbol.style.fontSize = `${Math.random() * 20 + 10}px`;
+                symbol.style.animationDuration = `${Math.random() * 15 + 10}s`;
+                symbol.style.animationDelay = `${Math.random() * 5}s`;
+                container.appendChild(symbol);
+            }
+        }
+
+        async function verifyUserStatus() {
+            try {
+                const response = await fetch('/api/user');
+                if (response.ok) {
+                    const user = await response.json();
+                    if (user.has_license && !user.is_banned) {
+                        // User has license and is not banned, redirect to dashboard
+                        window.location.href = '/dashboard.html';
+                        return; // Exit early
+                    }
+                    
+                    if (user.is_banned) {
+                        document.querySelector('.title').textContent = 'Account Suspended';
+                        const messageEl = document.querySelector('.message');
+                        let banMessage = 'Your account has been suspended from using the </async> Scanner service.';
+                        
+                        if (user.ban_reason) {
+                            banMessage += `<br><br><strong>Reason:</strong> ${user.ban_reason}`;
+                        }
+                        if (user.ban_expires_at) {
+                            const expirationDate = new Date(user.ban_expires_at);
+                            banMessage += `<br><br>This suspension will be lifted on: <strong>${expirationDate.toLocaleString()}</strong>.`;
+                        } else {
+                            banMessage += '<br><br>This suspension is permanent.';
+                        }
+                        
+                        if (user.responsible_admin_id) {
+                            banMessage += `<br><br><strong>Responsible Admin:</strong> <span id="admin-name-placeholder">Loading...</span>`;
+                        }
+
+                        messageEl.innerHTML = banMessage;
+                        
+                        const discordBtn = document.getElementById('discord-btn');
+                        if(discordBtn) discordBtn.style.display = 'none';
+
+                        if (user.responsible_admin_id) {
+                             try {
+                                const membersResponse = await fetch('/api/discord-members');
+                                if (membersResponse.ok) {
+                                    const members = await membersResponse.json();
+                                    const admin = members.find(m => m.id === user.responsible_admin_id);
+                                    const adminNameEl = document.getElementById('admin-name-placeholder');
+                                    if (adminNameEl) {
+                                        adminNameEl.textContent = admin ? admin.username : `ID ${user.responsible_admin_id}`;
+                                    }
+                                } else {
+                                     throw new Error('Failed to fetch members list');
+                                }
+                            } catch (err) {
+                                console.error("Could not fetch admin name:", err);
+                                const adminNameEl = document.getElementById('admin-name-placeholder');
+                                if (adminNameEl) {
+                                    adminNameEl.textContent = `ID ${user.responsible_admin_id}`;
+                                }
+                            }
+                        }
+                    }
+                    // Otherwise, they are just unlicensed, and the default page content is correct.
+                } else {
+                    // If not logged in, they shouldn't be here. Send to login page.
+                    window.location.href = '/index.html';
+                }
+            } catch (error) {
+                console.error("Error verifying user status:", error);
+                window.location.href = '/index.html';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createFloatingSymbols();
+            verifyUserStatus();
+        });
+    </script>
+</body>
+
+</html>

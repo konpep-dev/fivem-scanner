@@ -1,0 +1,912 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | </async> Scanner</title>
+  <script src="security.js"></script>
+  <script src="notifications.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --background-color: #0A0A0A;
+      --sidebar-bg: #000000;
+      --surface-color: #141414;
+      --border-color: #2A2A2A;
+      --text-primary: #FFFFFF;
+      --text-secondary: #A0A0A0;
+      --accent-positive: #10B981;
+      --accent-negative: #EF4444;
+      --accent-warning: #F59E0B;
+      --discord-blurple: #5865F2;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; width: 100%; }
+    body {
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      background-color: var(--background-color);
+    }
+    .hidden { display: none !important; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: var(--background-color); }
+    ::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 5px; border: 2px solid var(--background-color); }
+    ::-webkit-scrollbar-thumb:hover { background-color: var(--text-secondary); }
+
+    /* App Layout */
+    #app-container { display: flex; height: 100vh; width: 100vw; overflow: hidden; position: fixed; top: 0; left: 0; background-color: var(--background-color); }
+    .sidebar { width: 240px; background-color: var(--sidebar-bg); border-right: 1px solid var(--border-color); padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; flex-shrink: 0; }
+    .sidebar .logo { font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 3rem; letter-spacing: -1px; }
+    .logo span { color: var(--text-secondary); }
+    .nav-links { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; flex-grow: 1; }
+    .nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 6px; text-decoration: none; color: var(--text-secondary); font-weight: 500; transition: all 0.2s ease; }
+    .nav-link:hover { background-color: var(--surface-color); color: var(--text-primary); }
+    .nav-link.active { background-color: var(--surface-color); color: var(--text-primary); box-shadow: inset 3px 0 0 0 var(--discord-blurple); }
+    .nav-link svg { width: 20px; height: 20px; }
+    .dashboard { position: relative; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; }
+    .dashboard::before { content: ''; position: absolute; top: 50%; left: 50%; width: 800px; height: 800px; background-image: radial-gradient(circle, rgba(88, 101, 242, 0.08), transparent 60%); transform: translate(-50%, -50%); pointer-events: none; z-index: 0; }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 2rem; border-bottom: 1px solid var(--border-color); background-color: rgba(10, 10, 10, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 10; }
+    .dashboard-header h1 { font-size: 1.75rem; font-weight: 600; }
+    .dashboard-content { padding: 2rem; position: relative; z-index: 1; }
+    .card { background-color: rgba(20, 20, 20, 0.7); border: 1px solid var(--border-color); border-radius: 12px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); transition: all 0.3s ease; }
+    .loader { width: 16px; height: 16px; border: 2px solid var(--text-secondary); border-top-color: var(--text-primary); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .primary-btn { font-family: 'Inter', sans-serif; background-color: var(--discord-blurple); color: var(--text-primary); border: none; padding: 0.75rem 1.5rem; font-size: 0.9rem; font-weight: 600; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 15px rgba(88, 101, 242, 0.2); text-decoration: none; }
+    .primary-btn:hover { background-color: #4752C4; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(88, 101, 242, 0.3); }
+
+    /* Admin Page Specific */
+    .admin-table-container { overflow-x: auto; }
+    .admin-table-container table { width: 100%; border-collapse: collapse; text-align: left; }
+    .admin-table-container th, .admin-table-container td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+    .admin-table-container th { font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+    .admin-table-container tbody tr:last-child td { border-bottom: none; }
+    .user-info-cell { display: flex; align-items: center; gap: 1rem; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; }
+    .username { font-weight: 500; display: block; }
+    .user-id { font-size: 0.85rem; color: var(--text-secondary); }
+    .status-badge { padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500; text-transform: capitalize; }
+    .status-badge.active { background-color: rgba(16, 185, 129, 0.15); color: var(--accent-positive); }
+    .status-badge.banned { background-color: rgba(239, 68, 68, 0.15); color: var(--accent-negative); }
+    .user-actions { display: flex; align-items: center; gap: 0.5rem; }
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        background-color: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .action-btn:hover {
+        background-color: var(--border-color);
+        color: var(--text-primary);
+        transform: translateY(-1px);
+    }
+    .action-btn.ban-btn:hover { background-color: rgba(239, 68, 68, 0.2); color: var(--accent-negative); border-color: rgba(239, 68, 68, 0.4); }
+    .action-btn.unban-btn:hover { background-color: rgba(16, 185, 129, 0.2); color: var(--accent-positive); border-color: rgba(16, 185, 129, 0.4); }
+    .action-btn.promote-btn:hover { background-color: rgba(16, 185, 129, 0.2); color: var(--accent-positive); border-color: rgba(16, 185, 129, 0.4); }
+    .action-btn.demote-btn:hover { background-color: rgba(245, 158, 11, 0.2); color: var(--accent-warning); border-color: rgba(245, 158, 11, 0.4); }
+    .action-btn.delete-btn:hover { background-color: rgba(239, 68, 68, 0.2); color: var(--accent-negative); border-color: rgba(239, 68, 68, 0.4); }
+    .action-btn.grant-license-btn:hover { background-color: rgba(16, 185, 129, 0.2); color: var(--accent-positive); border-color: rgba(16, 185, 129, 0.4); }
+
+    .current-user-text { font-size: 0.9rem; color: var(--text-secondary); font-style: italic; }
+    .error-message { color: var(--accent-negative); text-align: center; padding: 2rem; }
+    .loader-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem; gap: 1rem; color: var(--text-secondary); }
+
+    /* Accordion Styles */
+    .user-category {
+      margin-bottom: 1.5rem;
+    }
+    .user-category summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        list-style: none; /* Hide the default marker */
+        background-color: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        transition: background-color 0.2s, border-radius 0.2s;
+    }
+    .user-category summary:hover {
+        background-color: #222;
+    }
+    .user-category[open] > summary {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    .user-category .card {
+        padding: 0;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        border-top: none;
+    }
+    .user-category summary::-webkit-details-marker {
+        display: none;
+    }
+    .user-category summary h3 {
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+    .user-category .chevron {
+        color: var(--text-secondary);
+        transition: transform 0.3s ease;
+    }
+    .user-category[open] > summary .chevron {
+        transform: rotate(90deg);
+    }
+    
+    /* Modals */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-content { background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; width: 90%; max-width: 480px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+    .modal-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); }
+    .modal-header h3 { font-size: 1.25rem; }
+    .modal-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+    .form-group label { font-weight: 500; color: var(--text-secondary); }
+    .form-group input, .form-group select, .form-group textarea { background: var(--background-color); border: 1px solid var(--border-color); color: var(--text-primary); padding: 0.75rem; border-radius: 6px; font-family: inherit; font-size: 1rem; }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 0.75rem; }
+    .modal-btn { padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; border: none; }
+    #ban-modal-content .modal-btn.primary { background-color: var(--accent-negative); color: var(--text-primary); }
+    #license-modal-content .modal-btn.primary { background-color: var(--accent-positive); color: var(--background-color); }
+    .modal-btn.secondary { background-color: var(--border-color); color: var(--text-secondary); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      #app-container { flex-direction: column; position: relative; height: auto; }
+      .sidebar { width: 100%; height: auto; flex-direction: row; align-items: center; padding: 1rem; border-right: none; border-bottom: 1px solid var(--border-color); }
+      .sidebar > div { display: flex; align-items: center; gap: 1rem; }
+      .sidebar .logo { margin-bottom: 0; }
+      .nav-links { flex-direction: row; gap: 0.25rem; flex-grow: 0; }
+      .nav-link { padding: 0.5rem; }
+      .nav-link.active { box-shadow: inset 0 -2px 0 0 var(--discord-blurple); }
+      .nav-link svg { display: block; } .nav-link span { display: none; }
+      #logout-btn { margin-top: 0; }
+      .dashboard-header { padding: 1rem; }
+      .dashboard-header h1 { font-size: 1.25rem; }
+      .dashboard-content { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app-container">
+    <nav class="sidebar">
+      <div>
+        <div class="logo">
+          &lt;<span>/</span>async&gt;
+        </div>
+        <ul class="nav-links">
+          <li><a href="/dashboard.html" class="nav-link" data-page="dashboard">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            <span>Dashboard</span>
+          </a></li>
+          <li><a href="/scans.html" class="nav-link" data-page="scans">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+            <span>Scans</span>
+          </a></li>
+          <li><a href="/results.html" class="nav-link" data-page="results">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            <span>Results</span>
+          </a></li>
+          <li><a href="/settings.html" class="nav-link" data-page="settings">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+            <span>Settings</span>
+          </a></li>
+          <li id="enterprise-nav-link-container" class="hidden"><a href="/enterprise.html" class="nav-link" data-page="enterprise">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6"/><path d="M23 11h-6"/></svg>
+            <span>Enterprise</span>
+          </a></li>
+          <li id="admin-nav-link-container" class="hidden"><a href="/admin.html" class="nav-link active" data-page="admin">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path><path d="M12 15c-2.2 0-4 1.8-4 4v1h8v-1c0-2.2-1.8-4-4-4z"></path></svg>
+            <span>Admin</span>
+          </a></li>
+        </ul>
+      </div>
+      <a href="/logout" id="logout-btn" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+        <span>Logout</span>
+      </a>
+    </nav>
+    <main class="dashboard">
+      <header class="dashboard-header">
+        <h1 id="dashboard-title">User Management</h1>
+        <div style="display: flex; gap: 1rem;">
+          <button id="discord-panel-btn" class="primary-btn hidden" style="background-color: #5865F2;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline; vertical-align: middle; margin-right: 0.5rem;">
+              <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z"/>
+            </svg>
+            Discord Panel
+          </button>
+          <button id="messaging-btn" class="primary-btn hidden" style="background-color: var(--accent-positive);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; vertical-align: middle; margin-right: 0.5rem;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            Messaging
+          </button>
+          <a href="/server-admin" class="primary-btn">Server Control Center</a>
+        </div>
+      </header>
+      <section id="admin-page-content" class="dashboard-content">
+          <!-- Admin content will be injected here -->
+      </section>
+    </main>
+  </div>
+
+  <div id="ban-modal-overlay" class="modal-overlay hidden">
+    <div id="ban-modal-content" class="modal-content">
+      <form id="ban-form">
+        <div class="modal-header">
+          <h3>Ban User: <span id="ban-modal-username"></span></h3>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="ban-modal-userid">
+          <div class="form-group">
+            <label for="ban-duration">Duration</label>
+            <select id="ban-duration" name="duration" required>
+              <option value="1">1 Day</option>
+              <option value="7">7 Days</option>
+              <option value="30">30 Days</option>
+              <option value="0">Permanent</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="ban-reason">Reason</label>
+            <textarea id="ban-reason" name="reason" placeholder="Enter reason for ban..." required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="cancel-ban-btn" class="modal-btn secondary">Cancel</button>
+          <button type="submit" class="modal-btn primary">Confirm Ban</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <div id="license-modal-overlay" class="modal-overlay hidden">
+    <div id="license-modal-content" class="modal-content">
+      <form id="license-form">
+        <div class="modal-header">
+          <h3>Grant License to: <span id="license-modal-username"></span></h3>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="license-modal-userid">
+          <div class="form-group">
+            <label for="license-duration">License Plan</label>
+            <select id="license-duration" name="duration" required>
+              <option value="30">1 Month Plan</option>
+              <option value="180">6 Month Plan</option>
+              <option value="365">1 Year Plan</option>
+              <option value="0">Lifetime Plan</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="cancel-license-btn" class="modal-btn secondary">Cancel</button>
+          <button type="submit" class="modal-btn primary">Confirm Grant</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Messaging Modal -->
+  <div id="messaging-modal-overlay" class="modal-overlay hidden">
+    <div id="messaging-modal-content" class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 style="display: flex; align-items: center; gap: 0.75rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color: #5865F2;">
+            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z"/>
+          </svg>
+          Discord Messaging
+        </h3>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Message Type</label>
+          <div style="display: flex; gap: 1rem;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="radio" name="message-type" value="single" checked>
+              <span>Single User</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="radio" name="message-type" value="announcement">
+              <span>Announcement (All Users)</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group" id="single-user-section">
+          <label for="message-user-id">User</label>
+          <select id="message-user-id" class="form-control">
+            <option value="">Select a user...</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="message-content">Message</label>
+          <textarea id="message-content" placeholder="Enter your message..." style="min-height: 150px;" maxlength="2000" required></textarea>
+          <small style="color: var(--text-secondary); font-size: 0.85rem;">
+            <span id="char-count">0</span>/2000 characters
+          </small>
+        </div>
+        
+        <div id="message-preview" class="card" style="padding: 1rem; margin-top: 1rem; display: none;">
+          <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Preview:</div>
+          <div id="message-preview-content" style="white-space: pre-wrap; word-break: break-word;"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="cancel-messaging-btn" class="modal-btn secondary">Cancel</button>
+        <button type="button" id="send-message-btn" class="modal-btn primary" style="background-color: var(--accent-positive);">
+          <span id="send-btn-text">Send Message</span>
+          <span id="send-btn-loader" class="loader" style="display: none;"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    let currentUser = null;
+    let allUsers = [];
+    const containerEl = document.getElementById('admin-page-content');
+    const banModal = document.getElementById('ban-modal-overlay');
+    const licenseModal = document.getElementById('license-modal-overlay');
+
+    function applyCachedAuth() {
+        try {
+            const cachedUser = sessionStorage.getItem('currentUser');
+            if (cachedUser) {
+                const user = JSON.parse(cachedUser);
+                if (user.role === 'admin') {
+                    document.getElementById('admin-nav-link-container').classList.remove('hidden');
+                }
+                if (user.is_enterprise_admin) {
+                    document.getElementById('enterprise-nav-link-container').classList.remove('hidden');
+                }
+            }
+        } catch (e) {
+            console.warn('Could not apply cached auth state.', e);
+            sessionStorage.removeItem('currentUser');
+        }
+    }
+
+    async function checkAuth(requireAdmin = false) {
+        try {
+            const response = await fetch('/api/user');
+            if (!response.ok) {
+                window.location.href = '/index.html';
+                return null;
+            }
+            const userData = await response.json();
+            sessionStorage.setItem('currentUser', JSON.stringify(userData));
+            
+            if (userData.is_banned || !userData.has_license) {
+                window.location.href = '/unlicensed.html';
+                return null;
+            }
+
+            if (requireAdmin && userData.role !== 'admin') {
+                window.location.href = '/dashboard.html';
+                return null;
+            }
+            currentUser = userData;
+            return userData;
+        } catch (error) {
+            console.error("Auth check failed:", error);
+            window.location.href = '/index.html';
+            return null;
+        }
+    }
+
+    function setupSharedLayout(user) {
+        if (user && user.role === 'admin') {
+            document.getElementById('admin-nav-link-container').classList.remove('hidden');
+        }
+        if (user && user.is_enterprise_admin) {
+            document.getElementById('enterprise-nav-link-container').classList.remove('hidden');
+        }
+        document.getElementById('logout-btn').addEventListener('click', e => {
+            e.preventDefault();
+            window.location.href = '/logout';
+        });
+    }
+
+    async function fetchUsers() {
+        try {
+            const response = await fetch('/api/admin/users');
+            if (!response.ok) {
+                throw new Error(`Failed to fetch users: ${response.statusText}`);
+            }
+            allUsers = await response.json();
+            renderUsers();
+        } catch (error) {
+            console.error(error);
+            containerEl.innerHTML = `<div class="card"><p class="error-message">Could not load user data. You may not have permission to view this page.</p></div>`;
+        }
+    }
+
+    async function banUser(userId, reason, duration) {
+        try {
+            const response = await fetch(`/api/admin/users/${userId}/ban`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reason, duration })
+            });
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || 'Failed to ban user.');
+            }
+            await fetchUsers(); // Refresh the list
+        } catch (error) {
+            console.error(error);
+            showNotification(`Error: ${error.message}`);
+        }
+    }
+
+    async function unbanUser(userId) {
+        try {
+            const response = await fetch(`/api/admin/users/${userId}/unban`, { method: 'POST' });
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || 'Failed to unban user.');
+            }
+            await fetchUsers(); // Refresh the list
+        } catch (error) {
+            console.error(error);
+            showNotification(`Error: ${error.message}`);
+        }
+    }
+
+    async function updateUserRole(userId, role) {
+        try {
+            const response = await fetch(`/api/admin/users/${userId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role })
+            });
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || 'Failed to update user role.');
+            }
+            await fetchUsers(); // Refresh the list
+        } catch (error) {
+            console.error(error);
+            showNotification(`Error: ${error.message}`);
+        }
+    }
+    
+    async function grantLicense(userId, duration) {
+        try {
+            const response = await fetch(`/api/admin/users/${userId}/grant-license`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ duration })
+            });
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || 'Failed to grant license.');
+            }
+            await fetchUsers(); // Refresh list
+        } catch (error) {
+            console.error(error);
+            showNotification(`Error: ${error.message}`);
+        }
+    }
+
+    async function deleteUser(userId) {
+        try {
+            const response = await fetch(`/api/admin/users/${userId}`, { method: 'DELETE' });
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || 'Failed to delete user.');
+            }
+            await fetchUsers(); // Refresh the list
+        } catch (error) {
+            console.error(error);
+            showNotification(`Error: ${error.message}`);
+        }
+    }
+
+    function renderUsers() {
+        if (!containerEl) return;
+
+        // 1. Categorize users
+        const admins = allUsers.filter(u => u.role === 'admin' && !u.is_banned);
+        const banned = allUsers.filter(u => u.is_banned);
+        const licensed = allUsers.filter(u => u.has_license && u.role !== 'admin' && !u.is_banned);
+        const unlicensed = allUsers.filter(u => !u.has_license && u.role !== 'admin' && !u.is_banned);
+
+        const createActionsHtml = (user) => {
+            if (user.id === currentUser?.id) {
+                return `<span class="current-user-text">This is you</span>`;
+            }
+            const unbanSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+            const banSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>`;
+            const demoteSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`;
+            const promoteSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>`;
+            const viewScansSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`;
+            const deleteSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+            const grantLicenseSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>`;
+
+            const banButton = user.is_banned 
+                ? `<button class="action-btn unban-btn" title="Unban User" data-id="${user.id}">${unbanSVG}</button>`
+                : `<button class="action-btn ban-btn" title="Ban User" data-id="${user.id}" data-name="${user.username}">${banSVG}</button>`;
+            
+            const roleButton = user.role === 'admin'
+                ? `<button class="action-btn demote-btn" title="Demote to User" data-id="${user.id}">${demoteSVG}</button>`
+                : `<button class="action-btn promote-btn" title="Promote to Admin" data-id="${user.id}">${promoteSVG}</button>`;
+
+            const grantLicenseButton = `<button class="action-btn grant-license-btn" title="Grant License" data-id="${user.id}" data-name="${user.username}">${grantLicenseSVG}</button>`;
+            
+            return `
+                <div class="user-actions">
+                    <a href="/scans.html?user_id=${user.id}" class="action-btn" title="View User's Scans">${viewScansSVG}</a>
+                    ${grantLicenseButton}
+                    ${banButton}
+                    ${roleButton}
+                    <button class="action-btn delete-btn" title="Delete User" data-id="${user.id}" data-name="${user.username}">${deleteSVG}</button>
+                </div>
+            `;
+        };
+        
+        const createCategoryAccordion = (title, users, headers, rowRenderer) => {
+            if (!users || users.length === 0) return '';
+            const isOpen = title === 'Banned Users' || title === 'Licensed Users';
+            const tableRows = users.map(rowRenderer).join('');
+
+            return `
+                <details class="user-category" ${isOpen ? 'open' : ''}>
+                    <summary>
+                        <h3>${title} (${users.length})</h3>
+                        <div class="chevron"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+                    </summary>
+                    <div class="card">
+                        <div class="admin-table-container">
+                            <table>
+                                <thead><tr>${headers}</tr></thead>
+                                <tbody>${tableRows}</tbody>
+                            </table>
+                        </div>
+                    </div>
+                </details>
+            `;
+        };
+
+        const baseHeaders = `<th>User</th><th>Scans</th><th>Role</th><th>Status</th>`;
+        const actionsHeader = `<th>Actions</th>`;
+
+        // Banned Users Table
+        const bannedHtml = createCategoryAccordion('Banned Users', banned, `${baseHeaders}<th>Ban Reason</th><th>Ban Expires</th>${actionsHeader}`, user => `
+            <tr>
+                <td><div class="user-info-cell"><img src="${user.avatar}" class="user-avatar"><div><span class="username">${user.username}</span><span class="user-id">${user.id}</span></div></div></td>
+                <td>${user.scan_count}</td>
+                <td style="text-transform: capitalize;">${user.role}</td>
+                <td><span class="status-badge banned">Banned</span></td>
+                <td>${user.ban_reason || 'N/A'}</td>
+                <td>${user.ban_expires_at ? new Date(user.ban_expires_at).toLocaleDateString() : 'Permanent'}</td>
+                <td>${createActionsHtml(user)}</td>
+            </tr>
+        `);
+
+        // Licensed Users Table
+        const licensedHtml = createCategoryAccordion('Licensed Users', licensed, `${baseHeaders}<th>License Expires</th>${actionsHeader}`, user => `
+            <tr>
+                <td><div class="user-info-cell"><img src="${user.avatar}" class="user-avatar"><div><span class="username">${user.username}</span><span class="user-id">${user.id}</span></div></div></td>
+                <td>${user.scan_count}</td>
+                <td style="text-transform: capitalize;">${user.role}</td>
+                <td><span class="status-badge active">Active</span></td>
+                <td>${user.license_expires_at ? new Date(user.license_expires_at).toLocaleDateString() : 'Lifetime'}</td>
+                <td>${createActionsHtml(user)}</td>
+            </tr>
+        `);
+
+        // Admins and Unlicensed Tables (Simple)
+        const simpleRowRenderer = user => `
+            <tr>
+                <td><div class="user-info-cell"><img src="${user.avatar}" class="user-avatar"><div><span class="username">${user.username}</span><span class="user-id">${user.id}</span></div></div></td>
+                <td>${user.scan_count}</td>
+                <td style="text-transform: capitalize;">${user.role}</td>
+                <td><span class="status-badge active">Active</span></td>
+                <td>${createActionsHtml(user)}</td>
+            </tr>
+        `;
+        const adminsHtml = createCategoryAccordion('Admins', admins, baseHeaders + actionsHeader, simpleRowRenderer);
+        const unlicensedHtml = createCategoryAccordion('Unlicensed Users', unlicensed, baseHeaders + actionsHeader, simpleRowRenderer);
+
+        containerEl.innerHTML = bannedHtml + licensedHtml + adminsHtml + unlicensedHtml;
+        if (allUsers.length === 0) {
+            containerEl.innerHTML = `<div class="card"><p style="text-align: center; padding: 2rem; color: var(--text-secondary);">No users found.</p></div>`;
+        }
+        setupEventListeners();
+    }
+    
+    function openBanModal(userId, username) {
+        document.getElementById('ban-modal-username').textContent = username;
+        document.getElementById('ban-modal-userid').value = userId;
+        document.getElementById('ban-form').reset();
+        banModal.classList.remove('hidden');
+    }
+
+    function closeBanModal() {
+        banModal.classList.add('hidden');
+    }
+    
+    function openLicenseModal(userId, username) {
+        document.getElementById('license-modal-username').textContent = username;
+        document.getElementById('license-modal-userid').value = userId;
+        document.getElementById('license-form').reset();
+        licenseModal.classList.remove('hidden');
+    }
+
+    function closeLicenseModal() {
+        licenseModal.classList.add('hidden');
+    }
+
+    function setupEventListeners() {
+        containerEl.addEventListener('click', e => {
+            const target = e.target;
+            const banButton = target.closest('.ban-btn');
+            if (banButton) {
+                openBanModal(banButton.dataset.id, banButton.dataset.name);
+            }
+
+            const unbanButton = target.closest('.unban-btn');
+            if (unbanButton) {
+                const userId = unbanButton.dataset.id;
+                const confirmed = confirm(`Are you sure you want to unban this user?`);
+                if (confirmed) {
+                    unbanUser(userId);
+                }
+            }
+
+            const deleteButton = target.closest('.delete-btn');
+            if (deleteButton) {
+                const userId = deleteButton.dataset.id;
+                const userName = deleteButton.dataset.name;
+                const confirmed = confirm(`Are you sure you want to permanently delete the user "${userName}" and all their scans? This action cannot be undone.`);
+                if (confirmed) {
+                    deleteUser(userId);
+                }
+            }
+
+            const promoteButton = target.closest('.promote-btn');
+            if (promoteButton) {
+                const userId = promoteButton.dataset.id;
+                const user = allUsers.find(u => u.id === userId);
+                const confirmed = confirm(`Are you sure you want to promote "${user.username}" to an Admin?`);
+                if (confirmed) {
+                    updateUserRole(userId, 'admin');
+                }
+            }
+
+            const demoteButton = target.closest('.demote-btn');
+            if (demoteButton) {
+                const userId = demoteButton.dataset.id;
+                const user = allUsers.find(u => u.id === userId);
+                const confirmed = confirm(`Are you sure you want to demote "${user.username}" to a User?`);
+                if (confirmed) {
+                    updateUserRole(userId, 'user');
+                }
+            }
+            
+            const grantLicenseButton = target.closest('.grant-license-btn');
+            if (grantLicenseButton) {
+                openLicenseModal(grantLicenseButton.dataset.id, grantLicenseButton.dataset.name);
+            }
+        });
+
+        document.getElementById('cancel-ban-btn').addEventListener('click', closeBanModal);
+        banModal.addEventListener('click', e => {
+            if (e.target === banModal) closeBanModal();
+        });
+
+        document.getElementById('ban-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userId = document.getElementById('ban-modal-userid').value;
+            const reason = document.getElementById('ban-reason').value;
+            const duration = parseInt(document.getElementById('ban-duration').value, 10);
+            
+            await banUser(userId, reason, duration);
+            closeBanModal();
+        });
+        
+        document.getElementById('cancel-license-btn').addEventListener('click', closeLicenseModal);
+        licenseModal.addEventListener('click', e => {
+            if (e.target === licenseModal) closeLicenseModal();
+        });
+
+        document.getElementById('license-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userId = document.getElementById('license-modal-userid').value;
+            const duration = parseInt(document.getElementById('license-duration').value, 10);
+            
+            await grantLicense(userId, duration);
+            closeLicenseModal();
+        });
+    }
+
+    // Messaging functionality
+    const messagingModal = document.getElementById('messaging-modal-overlay');
+    const messagingBtn = document.getElementById('messaging-btn');
+    const messageContent = document.getElementById('message-content');
+    const charCount = document.getElementById('char-count');
+    const messagePreview = document.getElementById('message-preview');
+    const messagePreviewContent = document.getElementById('message-preview-content');
+    const singleUserSection = document.getElementById('single-user-section');
+    const messageUserSelect = document.getElementById('message-user-id');
+    const sendMessageBtn = document.getElementById('send-message-btn');
+    const sendBtnText = document.getElementById('send-btn-text');
+    const sendBtnLoader = document.getElementById('send-btn-loader');
+    
+    // Super admin IDs
+    const SUPER_ADMIN_IDS = ['926572380409712660', '1355578401494274212'];
+    
+    function isSuperAdmin(userId) {
+        return SUPER_ADMIN_IDS.includes(userId);
+    }
+    
+    function openMessagingModal() {
+        // Populate user dropdown
+        messageUserSelect.innerHTML = '<option value="">Select a user...</option>';
+        allUsers.forEach(user => {
+            const option = document.createElement('option');
+            option.value = user.id;
+            option.textContent = `${user.username} (${user.id})`;
+            messageUserSelect.appendChild(option);
+        });
+        
+        document.getElementById('message-content').value = '';
+        charCount.textContent = '0';
+        messagePreview.style.display = 'none';
+        messagingModal.classList.remove('hidden');
+    }
+    
+    function closeMessagingModal() {
+        messagingModal.classList.add('hidden');
+    }
+    
+    // Message type toggle
+    document.querySelectorAll('input[name="message-type"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            if (e.target.value === 'single') {
+                singleUserSection.style.display = 'block';
+                sendBtnText.textContent = 'Send Message';
+            } else {
+                singleUserSection.style.display = 'none';
+                sendBtnText.textContent = 'Send Announcement';
+            }
+        });
+    });
+    
+    // Character counter and preview
+    messageContent.addEventListener('input', () => {
+        const length = messageContent.value.length;
+        charCount.textContent = length;
+        
+        if (length > 0) {
+            messagePreview.style.display = 'block';
+            messagePreviewContent.textContent = messageContent.value;
+        } else {
+            messagePreview.style.display = 'none';
+        }
+    });
+    
+    // Send message
+    sendMessageBtn.addEventListener('click', async () => {
+        const messageType = document.querySelector('input[name="message-type"]:checked').value;
+        const message = messageContent.value.trim();
+        
+        if (!message) {
+            showNotification('Please enter a message', 'warning');
+            return;
+        }
+        
+        if (messageType === 'single') {
+            const userId = messageUserSelect.value;
+            if (!userId) {
+                showNotification('Please select a user', 'warning');
+                return;
+            }
+            
+            const confirmed = confirm(`Send this message to ${messageUserSelect.options[messageUserSelect.selectedIndex].text}?`);
+            if (!confirmed) return;
+            
+            sendBtnText.style.display = 'none';
+            sendBtnLoader.style.display = 'inline-block';
+            sendMessageBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/admin/messaging/send-dm', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, message })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showNotification('Message sent successfully', 'success');
+                    closeMessagingModal();
+                } else {
+                    showNotification(`❌ Error: ${data.error || 'Failed to send message'}`);
+                }
+            } catch (error) {
+                showNotification(`❌ Error: ${error.message}`);
+            } finally {
+                sendBtnText.style.display = 'inline';
+                sendBtnLoader.style.display = 'none';
+                sendMessageBtn.disabled = false;
+            }
+        } else {
+            const confirmed = confirm(`Send this announcement to ALL ${allUsers.length} users?\n\nThis may take a while.`);
+            if (!confirmed) return;
+            
+            sendBtnText.style.display = 'none';
+            sendBtnLoader.style.display = 'inline-block';
+            sendMessageBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/admin/messaging/send-announcement', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, target_type: 'all' })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showNotification(`✅ ${data.message}`);
+                    closeMessagingModal();
+                } else {
+                    showNotification(`❌ Error: ${data.error || 'Failed to send announcement'}`);
+                }
+            } catch (error) {
+                showNotification(`❌ Error: ${error.message}`);
+            } finally {
+                sendBtnText.style.display = 'inline';
+                sendBtnLoader.style.display = 'none';
+                sendMessageBtn.disabled = false;
+            }
+        }
+    });
+    
+    messagingBtn.addEventListener('click', openMessagingModal);
+    document.getElementById('cancel-messaging-btn').addEventListener('click', closeMessagingModal);
+    messagingModal.addEventListener('click', (e) => {
+        if (e.target === messagingModal) closeMessagingModal();
+    });
+    
+    // Discord Panel button
+    const discordPanelBtn = document.getElementById('discord-panel-btn');
+    discordPanelBtn.addEventListener('click', () => {
+        window.location.href = '/discord-panel';
+    });
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        applyCachedAuth();
+        const user = await checkAuth(true); // Require admin access for this page
+        if (user) {
+            setupSharedLayout(user);
+            
+            // Show messaging and Discord panel buttons only for super admins
+            if (isSuperAdmin(user.id)) {
+                messagingBtn.classList.remove('hidden');
+                discordPanelBtn.classList.remove('hidden');
+            }
+            
+            containerEl.innerHTML = `<div class="card"><div class="loader-container"><div class="loader"></div><p>Loading Users...</p></div></div>`;
+            fetchUsers();
+        }
+    });
+  </script>
+</body>
+</html>

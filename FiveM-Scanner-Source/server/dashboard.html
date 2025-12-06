@@ -1,0 +1,742 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | </async> Scanner</title>
+  <script src="security.js"></script>
+  <script src="notifications.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #050505;
+      --bg-panel: #0a0a0a;
+      --surface-glass: rgba(20, 20, 20, 0.6);
+      --surface-glass-hover: rgba(30, 30, 30, 0.7);
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --text-primary: #ffffff;
+      --text-secondary: #a1a1aa;
+      --primary-glow: rgba(88, 101, 242, 0.5);
+      --accent-color: #5865F2;
+      --accent-hover: #4752C4;
+      --success: #10B981;
+      --danger: #EF4444;
+      --warning: #F59E0B;
+      --font-main: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 50%, rgba(88, 101, 242, 0.08), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.05), transparent 25%);
+      min-height: 100vh;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #444; }
+
+    /* Layout */
+    #app-container { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
+
+    /* Sidebar - Glassy & Sleek */
+    .sidebar {
+      width: 260px;
+      background: rgba(10, 10, 10, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-right: 1px solid var(--border-glass);
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-shrink: 0;
+      z-index: 50;
+    }
+
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 3rem;
+      text-shadow: 0 0 20px rgba(88, 101, 242, 0.5);
+      letter-spacing: 1px;
+    }
+    .logo span { color: var(--accent-color); }
+
+    .nav-links { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+    
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid transparent;
+    }
+
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.03);
+      color: #fff;
+      transform: translateX(4px);
+    }
+
+    .nav-link.active {
+      background: rgba(88, 101, 242, 0.1);
+      color: #fff;
+      border-color: rgba(88, 101, 242, 0.2);
+      box-shadow: 0 0 15px rgba(88, 101, 242, 0.1);
+    }
+
+    .nav-link svg { width: 20px; height: 20px; opacity: 0.8; }
+    .nav-link.active svg { opacity: 1; color: var(--accent-color); }
+
+    /* Main Content */
+    .dashboard {
+      flex-grow: 1;
+      overflow-y: auto;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2rem 3rem;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: linear-gradient(to bottom, var(--bg-dark) 0%, rgba(5, 5, 5, 0) 100%);
+      backdrop-filter: blur(5px);
+    }
+
+    .dashboard-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(to right, #fff, #a1a1aa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    /* Buttons */
+    .primary-btn {
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(88, 101, 242, 0.3);
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(88, 101, 242, 0.4);
+      background: var(--accent-hover);
+    }
+
+    .secondary-btn {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-glass);
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+    }
+
+    .secondary-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Dashboard Content Grid */
+    .dashboard-content { padding: 0 3rem 3rem 3rem; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Glass Cards */
+    .card {
+      background: var(--surface-glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-glass);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Stat Cards */
+    .stat-card h3 {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.25rem;
+      letter-spacing: -1px;
+    }
+    
+    .stat-number.text-stat { font-size: 1.5rem; color: var(--success); }
+
+    .stat-change {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    /* Activity Log */
+    .activity-card h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: #fff;
+    }
+
+    .activity-log { list-style: none; }
+    
+    .activity-log li {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border-glass);
+      transition: background 0.2s;
+    }
+    
+    .activity-log li:hover {
+      background: rgba(255,255,255,0.02);
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+      border-radius: 8px;
+      border-bottom-color: transparent;
+    }
+
+    .activity-status {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      box-shadow: 0 0 10px currentColor;
+    }
+    .activity-status.success { background: var(--success); color: var(--success); }
+    .activity-status.warning { background: var(--warning); color: var(--warning); }
+    .activity-status.error { background: var(--danger); color: var(--danger); }
+
+    .activity-time {
+      margin-left: auto;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+    }
+
+    /* Chart Container */
+    .chart-container {
+      position: relative;
+      height: 300px;
+      width: 100%;
+      margin-top: 1rem;
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-overlay:not(.hidden) {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal-content {
+      background: #0f0f0f;
+      border: 1px solid var(--border-glass);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      width: 90%;
+      max-width: 700px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 2rem;
+      border-radius: 16px;
+    }
+
+    .hidden { display: none !important; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      #app-container { flex-direction: column; height: auto; overflow: auto; }
+      .sidebar { width: 100%; height: auto; padding: 1rem; flex-direction: row; align-items: center; position: sticky; top: 0; }
+      .nav-links { flex-direction: row; overflow-x: auto; }
+      .dashboard-content { padding: 1.5rem; }
+      .dashboard-header { padding: 1.5rem; flex-direction: column; gap: 1rem; align-items: flex-start; }
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app-container">
+    <nav class="sidebar">
+      <div>
+        <div class="logo">
+          &lt;<span>/</span>async&gt;
+        </div>
+        <ul class="nav-links">
+          <li><a href="/dashboard.html" class="nav-link active" data-page="dashboard">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            <span>Dashboard</span>
+          </a></li>
+          <li><a href="/scans.html" class="nav-link" data-page="scans">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+            <span>Scans</span>
+          </a></li>
+          <li><a href="/results.html" class="nav-link" data-page="results">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            <span>Results</span>
+          </a></li>
+          <li><a href="/settings.html" class="nav-link" data-page="settings">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+            <span>Settings</span>
+          </a></li>
+          <li><a href="/rules.html" class="nav-link" data-page="rules">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+            <span>Rules</span>
+          </a></li>
+          <li id="enterprise-nav-link-container" class="hidden"><a href="/enterprise.html" class="nav-link" data-page="enterprise">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6"/><path d="M23 11h-6"/></svg>
+            <span>Enterprise</span>
+          </a></li>
+          <li id="admin-nav-link-container" class="hidden"><a href="/admin.html" class="nav-link" data-page="admin">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path><path d="M12 15c-2.2 0-4 1.8-4 4v1h8v-1c0-2.2-1.8-4-4-4z"></path></svg>
+            <span>Admin</span>
+          </a></li>
+        </ul>
+      </div>
+      <a href="/logout" id="logout-btn" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+        <span>Logout</span>
+      </a>
+    </nav>
+    <main class="dashboard">
+      <header class="dashboard-header">
+        <h1 id="dashboard-title">Dashboard Overview</h1>
+        <div id="header-actions">
+            <button class="secondary-btn" id="how-to-read-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                <span>How to Read Reports</span>
+            </button>
+            <button class="primary-btn" id="header-action-btn">Start New Scan</button>
+        </div>
+      </header>
+      <section class="dashboard-content">
+        <div id="dashboard-page" class="page">
+          <div class="stats-grid">
+            <div class="card stat-card">
+              <h3>Total Scans</h3>
+              <p class="stat-number">...</p>
+              <p class="stat-change">Updated just now</p>
+            </div>
+            <div class="card stat-card">
+              <h3>Threats Detected</h3>
+              <p class="stat-number" style="color: var(--danger);">...</p>
+              <p class="stat-change">Critical attention needed</p>
+            </div>
+            <div class="card stat-card">
+              <h3>System Status</h3>
+              <p class="stat-number text-stat">Operational</p>
+              <p class="stat-change">All systems normal</p>
+            </div>
+            <div class="card stat-card">
+              <h3>Uptime</h3>
+              <p class="stat-number">99.9%</p>
+              <p class="stat-change">Last 30 days</p>
+            </div>
+          </div>
+
+          <!-- New Chart Section -->
+          <div class="stats-grid" style="grid-template-columns: 2fr 1fr;">
+            <div class="card">
+                <h3>Scan Activity (Last 7 Days)</h3>
+                <div class="chart-container">
+                    <canvas id="scanActivityChart"></canvas>
+                </div>
+            </div>
+            <div class="card activity-card">
+                <h3>Recent Activity</h3>
+                <ul class="activity-log">
+                  <li>Loading...</li>
+                </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="tos-modal-overlay" class="modal-overlay hidden">
+    <div class="card modal-content" id="tos-modal-content">
+        <h3>Terms of Service</h3>
+        <div class="tos-text-content">
+            <h4>1. Your License to Use &lt;/async&gt;</h4>
+            <p>We grant you a personal, limited license to use our software for its intended security purpose.</p>
+            <!-- (Simplified for brevity, keeping structure) -->
+            <p>By clicking Accept, you agree to all terms.</p>
+        </div>
+        <div class="modal-actions" style="margin-top: 2rem; display: flex; justify-content: flex-end; gap: 1rem;">
+            <a href="/logout" class="secondary-btn">Decline & Logout</a>
+            <button id="accept-tos-btn" class="primary-btn">Accept & Continue</button>
+        </div>
+    </div>
+  </div>
+
+  <div id="report-guide-modal-overlay" class="modal-overlay hidden">
+    <div class="card modal-content">
+        <div class="modal-header" style="display: flex; justify-content: space-between; margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.5rem; font-weight: 700;">📖 How to Read Scan Reports</h3>
+            <button id="report-guide-close-btn" style="background:none; border:none; color:white; font-size: 1.5rem; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">&times;</button>
+        </div>
+        <div class="modal-body" style="max-height: 60vh; overflow-y: auto; padding-right: 1rem;">
+            <div style="background: rgba(88, 101, 242, 0.1); border-left: 3px solid var(--accent-color); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <p style="color: var(--text-primary); line-height: 1.6;">This guide will help you understand and interpret the scan reports generated by the </async> Scanner.</p>
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <h4 style="color: var(--accent-color); margin-bottom: 0.75rem; font-size: 1.1rem;">🎯 Risk Score</h4>
+                <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 0.5rem;">The risk score (0-100) indicates the overall threat level:</p>
+                <ul style="list-style: none; padding-left: 0; margin-top: 0.5rem;">
+                    <li style="padding: 0.5rem; margin-bottom: 0.5rem; background: rgba(16, 185, 129, 0.1); border-left: 3px solid var(--success); border-radius: 4px;"><strong style="color: var(--success);">0-25:</strong> Clean - No significant threats detected</li>
+                    <li style="padding: 0.5rem; margin-bottom: 0.5rem; background: rgba(245, 158, 11, 0.1); border-left: 3px solid var(--warning); border-radius: 4px;"><strong style="color: var(--warning);">26-50:</strong> Low Risk - Minor suspicious activity</li>
+                    <li style="padding: 0.5rem; margin-bottom: 0.5rem; background: rgba(249, 115, 22, 0.1); border-left: 3px solid #f97316; border-radius: 4px;"><strong style="color: #f97316;">51-75:</strong> High Risk - Multiple threats found</li>
+                    <li style="padding: 0.5rem; margin-bottom: 0.5rem; background: rgba(239, 68, 68, 0.1); border-left: 3px solid var(--danger); border-radius: 4px;"><strong style="color: var(--danger);">76-100:</strong> Critical - Severe threats detected</li>
+                </ul>
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <h4 style="color: var(--accent-color); margin-bottom: 0.75rem; font-size: 1.1rem;">🔍 Findings Categories</h4>
+                <div style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem;">
+                    <strong style="color: var(--text-primary);">Critical Severity:</strong>
+                    <p style="color: var(--text-secondary); margin-top: 0.25rem; line-height: 1.6;">Known cheat files, injectors, or malicious software. Immediate action required.</p>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem;">
+                    <strong style="color: var(--text-primary);">High Severity:</strong>
+                    <p style="color: var(--text-secondary); margin-top: 0.25rem; line-height: 1.6;">Suspicious files or processes that match cheat patterns. Requires investigation.</p>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem;">
+                    <strong style="color: var(--text-primary);">Medium Severity:</strong>
+                    <p style="color: var(--text-secondary); margin-top: 0.25rem; line-height: 1.6;">Potentially suspicious activity or files. May be false positives.</p>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: 8px;">
+                    <strong style="color: var(--text-primary);">Low Severity:</strong>
+                    <p style="color: var(--text-secondary); margin-top: 0.25rem; line-height: 1.6;">Minor anomalies or informational findings. Usually safe.</p>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <h4 style="color: var(--accent-color); margin-bottom: 0.75rem; font-size: 1.1rem;">📊 System Information</h4>
+                <p style="color: var(--text-secondary); line-height: 1.6;">Review the system details to understand the user's environment:</p>
+                <ul style="color: var(--text-secondary); padding-left: 1.5rem; margin-top: 0.5rem; line-height: 1.8;">
+                    <li><strong>Hardware ID:</strong> Unique identifier for the system</li>
+                    <li><strong>OS Version:</strong> Operating system information</li>
+                    <li><strong>Antivirus:</strong> Installed security software</li>
+                    <li><strong>Uptime:</strong> How long the system has been running</li>
+                </ul>
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <h4 style="color: var(--accent-color); margin-bottom: 0.75rem; font-size: 1.1rem;">👤 User Identities</h4>
+                <p style="color: var(--text-secondary); line-height: 1.6;">Check for Discord, Steam, and other gaming platform accounts linked to the system. This helps verify the user's identity.</p>
+            </div>
+
+            <div style="background: rgba(88, 101, 242, 0.1); border: 1px solid rgba(88, 101, 242, 0.3); padding: 1rem; border-radius: 8px;">
+                <strong style="color: var(--accent-color);">💡 Pro Tip:</strong>
+                <p style="color: var(--text-secondary); margin-top: 0.5rem; line-height: 1.6;">Always cross-reference findings with the user's behavior and history. A single finding doesn't always mean guilt - context matters!</p>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <script type="module">
+    let currentUser = null;
+    let scanChart = null;
+
+    function initChart() {
+        const ctx = document.getElementById('scanActivityChart').getContext('2d');
+        
+        // Gradient for the chart
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(88, 101, 242, 0.5)');
+        gradient.addColorStop(1, 'rgba(88, 101, 242, 0.0)');
+
+        scanChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Scans Performed',
+                    data: [12, 19, 3, 5, 2, 3, 15], // Dummy data for visual
+                    borderColor: '#5865F2',
+                    backgroundColor: gradient,
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#5865F2',
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#ccc',
+                        padding: 10,
+                        cornerRadius: 8,
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#a1a1aa' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#a1a1aa' }
+                    }
+                }
+            }
+        });
+    }
+
+    function applyCachedAuth() {
+        try {
+            const cachedUser = sessionStorage.getItem('currentUser');
+            if (cachedUser) {
+                const user = JSON.parse(cachedUser);
+                if (user.role === 'admin') {
+                    document.getElementById('admin-nav-link-container').classList.remove('hidden');
+                }
+                if (user.is_enterprise_admin) {
+                    document.getElementById('enterprise-nav-link-container').classList.remove('hidden');
+                }
+            }
+        } catch (e) {
+            console.warn('Could not apply cached auth state.', e);
+            sessionStorage.removeItem('currentUser');
+        }
+    }
+
+    async function checkAuth() {
+        try {
+            const response = await fetch('/api/user');
+            if (!response.ok) {
+                window.location.href = '/index.html';
+                return null;
+            }
+            const userData = await response.json();
+            sessionStorage.setItem('currentUser', JSON.stringify(userData));
+            if (userData.is_banned || !userData.has_license) {
+                window.location.href = '/unlicensed.html';
+                return null;
+            }
+            currentUser = userData;
+            return userData;
+        } catch (error) {
+            console.error("Auth check failed:", error);
+            window.location.href = '/index.html';
+            return null;
+        }
+    }
+
+    function setupSharedLayout(user) {
+        if (user && user.role === 'admin') {
+            document.getElementById('admin-nav-link-container').classList.remove('hidden');
+        }
+        if (user && user.is_enterprise_admin) {
+            document.getElementById('enterprise-nav-link-container').classList.remove('hidden');
+        }
+        document.getElementById('logout-btn').addEventListener('click', e => {
+            e.preventDefault();
+            window.location.href = '/logout';
+        });
+    }
+
+    async function fetchDashboardStats() {
+        try {
+            const response = await fetch('/api/dashboard-stats');
+            if (!response.ok) throw new Error('Failed to fetch dashboard stats.');
+            const stats = await response.json();
+
+            const totalScansEl = document.querySelector('.stats-grid .card:nth-child(1) .stat-number');
+            if (totalScansEl) totalScansEl.textContent = stats.totalScans;
+
+            const threatsDetectedEl = document.querySelector('.stats-grid .card:nth-child(2) .stat-number');
+            if (threatsDetectedEl) threatsDetectedEl.textContent = stats.threatsDetected;
+
+            const activityLogEl = document.querySelector('.activity-log');
+            if (activityLogEl) {
+                if (stats.recentActivity && stats.recentActivity.length > 0) {
+                    activityLogEl.innerHTML = stats.recentActivity.map(activity => `
+                        <li>
+                            <span class="activity-status ${activity.status}"></span>
+                            ${activity.message}
+                            <span class="activity-time">${activity.time}</span>
+                        </li>
+                    `).join('');
+                } else {
+                    activityLogEl.innerHTML = `<li>No recent activity to display.</li>`;
+                }
+            }
+            
+            // Update Chart Data if available in stats
+            if (scanChart && stats.scanHistory) {
+                scanChart.data.datasets[0].data = stats.scanHistory;
+                scanChart.update();
+            }
+
+        } catch (error) {
+            console.error("Error fetching dashboard stats:", error);
+        }
+    }
+
+    function showTosModal() {
+        const overlay = document.getElementById('tos-modal-overlay');
+        const acceptBtn = document.getElementById('accept-tos-btn');
+        if (!overlay || !acceptBtn) return;
+
+        overlay.classList.remove('hidden');
+        document.body.classList.add('modal-open');
+
+        acceptBtn.addEventListener('click', async () => {
+            acceptBtn.disabled = true;
+            acceptBtn.textContent = 'Accepting...';
+            try {
+                const response = await fetch('/api/accept-tos', { method: 'POST' });
+                if (!response.ok) throw new Error('Failed to accept ToS.');
+                
+                overlay.classList.add('hidden');
+                document.body.classList.remove('modal-open');
+                
+                if (currentUser) {
+                    currentUser.tos_accepted = true;
+                    sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                }
+
+                fetchDashboardStats();
+                initChart(); // Init chart after ToS
+                document.getElementById('header-action-btn').addEventListener('click', () => {
+                    window.location.href = '/scans.html';
+                });
+
+            } catch (error) {
+                console.error(error);
+                alert('An error occurred. Please try again.');
+                acceptBtn.disabled = false;
+                acceptBtn.textContent = 'Accept & Continue';
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        applyCachedAuth();
+        const user = await checkAuth();
+        if (user) {
+            setupSharedLayout(user);
+            
+            if (!user.tos_accepted) {
+                showTosModal();
+            } else {
+                fetchDashboardStats();
+                initChart(); // Init chart immediately
+                document.getElementById('header-action-btn').addEventListener('click', () => {
+                    window.location.href = '/scans.html';
+                });
+            }
+
+            // Modal Logic
+            const guideModal = document.getElementById('report-guide-modal-overlay');
+            const openGuideBtn = document.getElementById('how-to-read-btn');
+            const closeGuideBtn = document.getElementById('report-guide-close-btn');
+
+            if (guideModal && openGuideBtn && closeGuideBtn) {
+                openGuideBtn.addEventListener('click', () => guideModal.classList.remove('hidden'));
+                closeGuideBtn.addEventListener('click', () => guideModal.classList.add('hidden'));
+                guideModal.addEventListener('click', (e) => {
+                    if (e.target === guideModal) guideModal.classList.add('hidden');
+                });
+            }
+        }
+    });
+  </script>
+</body>
+</html>
