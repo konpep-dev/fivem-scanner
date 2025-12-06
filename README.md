@@ -13,7 +13,9 @@
   <img src="https://img.shields.io/badge/version-2.0.0-blue" alt="Version"/>
   <img src="https://img.shields.io/badge/platform-Windows-lightgrey" alt="Platform"/>
   <img src="https://img.shields.io/badge/.NET-6.0-purple" alt=".NET"/>
-  <img src="https://img.shields.io/badge/license-Proprietary-red" alt="License"/>
+  <a href="https://github.com/konpep-dev/fivem-scanner/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-green" alt="License"/>
+  </a>
 </p>
 
 ---
