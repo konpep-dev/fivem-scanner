@@ -3,6 +3,9 @@
 (function() {
     'use strict';
 
+    // DISABLED FOR LOCALHOST - Uncomment for production
+    return;
+
     // This security module applies to all pages.
 
     // A flag to prevent multiple triggers
