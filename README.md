@@ -90,11 +90,21 @@ The scanner detects **100+ known cheats** including:
 
 ## 🖥️ System Requirements
 
+### Scanner Client (Windows)
 - **OS:** Windows 10/11 (64-bit)
 - **RAM:** 4GB minimum
 - **Disk:** 100MB free space
 - **.NET:** Embedded (self-contained build)
 - **Admin Rights:** Required for full scanning
+
+### Server (Backend)
+- **OS:** Linux (Ubuntu 20.04+) or Windows Server
+- **Python:** 3.8 or higher
+- **RAM:** 2GB minimum (4GB recommended)
+- **Database:** SQLite (default) or MySQL/MariaDB
+- **Ports:** 5000 (default) or custom
+- **SSL:** Required for production (use Cloudflare or nginx)
+- **Domain:** Required for Discord OAuth2
 
 ---
 
@@ -232,12 +242,52 @@ var serverUrl = "https://YOUR-DOMAIN.com";
 
 ---
 
+## ⚠️ Important: CheatDatabase.cs
+
+The `CheatDatabase.cs` file contains **SAMPLE/DEMO signatures only**. You MUST customize it with your own detection rules!
+
+### What you need to add:
+
+1. **File Hashes** - MD5, SHA1, SHA256 of known cheat executables
+2. **Suspicious Strings** - Unique strings found in cheat files
+3. **Process Names** - Known cheat process names
+4. **DNS/Domains** - Cheat API endpoints and websites
+5. **File Patterns** - Regex patterns for cheat file names
+6. **YARA Rules** - Advanced pattern matching rules
+
+### Example - Adding a new cheat signature:
+
+```csharp
+new CheatSignature
+{
+    Name = "Your Cheat Name",
+    Description = "Description of the cheat",
+    FileNames = new List<string> { "cheat.exe", "loader.exe" },
+    MD5Hashes = new List<string> { "abc123..." },
+    SHA256Hashes = new List<string> { "def456..." },
+    Strings = new List<string> { "unique_string_in_cheat", "api.cheats.com" },
+    DNS = new List<string> { "api.cheatsite.com" },
+    ProcessNames = new List<string> { "cheat_process.exe" },
+    Severity = "Critical",
+    Category = "Cheat Detection"
+}
+```
+
+### Where to find cheat signatures:
+- Analyze cheat samples with tools like PE Studio, DIE, x64dbg
+- Extract unique strings with `strings` command
+- Calculate file hashes
+- Monitor network traffic for API calls
+- Check cheat forums for file names and patterns
+
+---
+
 ## 📁 Project Structure
 
 ```
 ├── c# scanner/              # Main scanner application (WPF)
 │   ├── Scanner.cs           # Core scanning engine
-│   ├── CheatDatabase.cs     # Cheat signatures database
+│   ├── CheatDatabase.cs     # ⚠️ SAMPLE signatures - ADD YOUR OWN!
 │   ├── ApiClient.cs         # Server communication
 │   ├── BehaviorEngine.cs    # Behavioral analysis
 │   ├── HybridScanner.cs     # Hybrid detection
@@ -328,5 +378,5 @@ This tool is intended **exclusively** for use by authorized server administrator
 
 <p align="center">
   <b>Made with ❤️ by 𝓴𝓸𝓷𝓹𝓮𝓹ᵗᵐ</b><br>
-  <i>Keeping FiveM servers clean since 2024</i>
+  <i>Keeping FiveM servers clean since 2025</i>
 </p>
