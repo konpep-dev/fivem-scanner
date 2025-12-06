@@ -18,6 +18,22 @@
 
 ---
 
+## 📸 Screenshots
+
+<p align="center">
+  <img src="images/screenshot1.png" width="700"/>
+</p>
+
+<p align="center">
+  <img src="images/screenshot2.png" width="700"/>
+</p>
+
+<p align="center">
+  <img src="images/screenshot3.png" width="700"/>
+</p>
+
+---
+
 ## 📋 What is this?
 
 This is a professional **cheat detection scanner** for FiveM servers. It performs deep forensic analysis on a player's system and reports findings to your admin panel.
