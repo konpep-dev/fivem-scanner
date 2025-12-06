@@ -10,11 +10,12 @@
 </p>
 
 <p align="center">
+<p align="center">
   <img src="https://img.shields.io/badge/version-2.0.0-blue" alt="Version"/>
   <img src="https://img.shields.io/badge/platform-Windows-lightgrey" alt="Platform"/>
   <img src="https://img.shields.io/badge/.NET-6.0-purple" alt=".NET"/>
-  <a href="https://github.com/konpep-dev/fivem-scanner/blob/main/LICENSE">
-    <img src="https://img.shields.io/badge/license-MIT-green" alt="License"/>
+  <img src="https://img.shields.io/badge/license-Proprietary-red" alt="License"/>
+</p>
   </a>
 </p>
 
