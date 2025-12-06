@@ -1,6 +1,5 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,576 +8,345 @@
   <script src="notifications.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700&family=JetBrains+Mono:wght@400&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #050505;
-      --bg-panel: #0a0a0a;
-      --surface-glass: rgba(20, 20, 20, 0.6);
-      --surface-glass-hover: rgba(30, 30, 30, 0.7);
-      --border-glass: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a1a1aa;
-      --primary-glow: rgba(88, 101, 242, 0.5);
-      --accent-color: #5865F2;
-      --accent-hover: #4752C4;
-      --success: #10B981;
-      --danger: #EF4444;
-      --warning: #F59E0B;
-      --font-main: 'Inter', sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
+      --background-color: #0A0A0A;
+      --sidebar-bg: #000000;
+      --surface-color: #141414;
+      --border-color: #2A2A2A;
+      --text-primary: #FFFFFF;
+      --text-secondary: #A0A0A0;
+      --accent-positive: #10B981;
+      --accent-negative: #EF4444;
+      --accent-warning: #F59E0B;
+      --discord-blurple: #5865F2;
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; width: 100%; }
     body {
-      background-color: var(--bg-dark);
       color: var(--text-primary);
-      font-family: var(--font-main);
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
-      background-image:
-        radial-gradient(circle at 15% 50%, rgba(88, 101, 242, 0.08), transparent 25%),
-        radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.05), transparent 25%);
-      min-height: 100vh;
+      background-color: var(--background-color);
     }
+    .hidden { display: none !important; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: var(--background-color); }
+    ::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 5px; border: 2px solid var(--background-color); }
+    ::-webkit-scrollbar-thumb:hover { background-color: var(--text-secondary); }
 
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: #333;
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: #444;
-    }
-
-    /* Layout */
-    #app-container {
-      display: flex;
-      height: 100vh;
-      width: 100vw;
-      overflow: hidden;
-    }
-
-    /* Sidebar - Glassy & Sleek */
-    .sidebar {
-      width: 260px;
-      background: rgba(10, 10, 10, 0.8);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-right: 1px solid var(--border-glass);
-      padding: 2rem 1.5rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      flex-shrink: 0;
-      z-index: 50;
-    }
-
-    .logo {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 3rem;
-      text-shadow: 0 0 20px rgba(88, 101, 242, 0.5);
-      letter-spacing: 1px;
-    }
-
-    .logo span {
-      color: var(--accent-color);
-    }
-
-    .nav-links {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .nav-link {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 0.85rem 1rem;
-      border-radius: 12px;
-      text-decoration: none;
-      color: var(--text-secondary);
-      font-weight: 500;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border: 1px solid transparent;
-    }
-
-    .nav-link:hover {
-      background: rgba(255, 255, 255, 0.03);
-      color: #fff;
-      transform: translateX(4px);
-    }
-
-    .nav-link.active {
-      background: rgba(88, 101, 242, 0.1);
-      color: #fff;
-      border-color: rgba(88, 101, 242, 0.2);
-      box-shadow: 0 0 15px rgba(88, 101, 242, 0.1);
-    }
-
-    .nav-link svg {
-      width: 20px;
-      height: 20px;
-      opacity: 0.8;
-    }
-
-    .nav-link.active svg {
-      opacity: 1;
-      color: var(--accent-color);
-    }
-
-    /* Main Content */
-    .dashboard {
-      flex-grow: 1;
-      overflow-y: auto;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .dashboard-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 2rem 3rem;
-      position: sticky;
-      top: 0;
-      z-index: 40;
-      background: linear-gradient(to bottom, var(--bg-dark) 0%, rgba(5, 5, 5, 0) 100%);
-      backdrop-filter: blur(5px);
-    }
-
-    .dashboard-header h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      background: linear-gradient(to right, #fff, #a1a1aa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: -0.5px;
-    }
-
-    #header-actions {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    /* Buttons */
-    .primary-btn {
-      background: var(--accent-color);
-      color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 10px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 20px rgba(88, 101, 242, 0.3);
-    }
-
-    .primary-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(88, 101, 242, 0.4);
-      background: var(--accent-hover);
-    }
-
-    .primary-btn:disabled {
-      background: #333;
-      color: #666;
-      cursor: not-allowed;
-      box-shadow: none;
-      transform: none;
-    }
-
-    .secondary-btn {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-secondary);
-      border: 1px solid var(--border-glass);
-      padding: 0.75rem 1.5rem;
-      border-radius: 10px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      text-decoration: none;
-    }
-
-    .secondary-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-
+    /* App Layout */
+    #app-container { display: flex; height: 100vh; width: 100vw; overflow: hidden; position: fixed; top: 0; left: 0; background-color: var(--background-color); }
+    .sidebar { width: 240px; background-color: var(--sidebar-bg); border-right: 1px solid var(--border-color); padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; flex-shrink: 0; }
+    .sidebar .logo { font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 3rem; letter-spacing: -1px; }
+    .logo span { color: var(--text-secondary); }
+    .nav-links { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; flex-grow: 1; }
+    .nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 6px; text-decoration: none; color: var(--text-secondary); font-weight: 500; transition: all 0.2s ease; }
+    .nav-link:hover { background-color: var(--surface-color); color: var(--text-primary); }
+    .nav-link.active { background-color: var(--surface-color); color: var(--text-primary); box-shadow: inset 3px 0 0 0 var(--discord-blurple); }
+    .nav-link svg { width: 20px; height: 20px; }
+    .dashboard { position: relative; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; }
+    .dashboard::before { content: ''; position: absolute; top: 50%; left: 50%; width: 800px; height: 800px; background-image: radial-gradient(circle, rgba(88, 101, 242, 0.08), transparent 60%); transform: translate(-50%, -50%); pointer-events: none; z-index: 0; }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 2rem; border-bottom: 1px solid var(--border-color); background-color: rgba(10, 10, 10, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 10; }
+    .dashboard-header h1 { font-size: 1.75rem; font-weight: 600; }
+    #header-actions { display: flex; align-items: center; gap: 0.75rem; }
+    .primary-btn { font-family: 'Inter', sans-serif; background-color: var(--discord-blurple); color: var(--text-primary); border: none; padding: 0.75rem 1.5rem; font-size: 0.9rem; font-weight: 600; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 15px rgba(88, 101, 242, 0.2); }
+    .primary-btn:hover { background-color: #4752C4; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(88, 101, 242, 0.3); }
+    .primary-btn:disabled { background-color: #3e479b; cursor: not-allowed; transform: none; box-shadow: none; }
+    .secondary-btn { font-family: 'Inter', sans-serif; background-color: var(--surface-color); color: var(--text-primary); border: 1px solid var(--border-color); padding: 0.75rem 1.5rem; font-size: 0.9rem; font-weight: 600; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; }
+    .secondary-btn:hover { background-color: var(--border-color); }
     .game-select-dropdown {
-      font-family: var(--font-main);
-      background: rgba(20, 20, 20, 0.8);
-      color: #fff;
-      border: 1px solid var(--border-glass);
-      padding: 0.75rem 1rem;
-      border-radius: 10px;
-      cursor: pointer;
-      outline: none;
+        font-family: 'Inter', sans-serif;
+        background-color: var(--surface-color);
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23A0A0A0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        padding-right: 2.5rem; /* Make space for arrow */
     }
-
-    .dashboard-content {
-      padding: 0 3rem 3rem 3rem;
+    .game-select-dropdown:hover {
+        background-color: var(--border-color);
+        color: var(--text-primary);
     }
-
-    /* Scans List Card */
-    .card {
-      background: var(--surface-glass);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--border-glass);
-      border-radius: 16px;
-      padding: 1.5rem;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .scans-list-card {
-      padding: 0;
-    }
-
-    #no-scans-message {
-      padding: 3rem;
-      text-align: center;
-      color: var(--text-secondary);
-    }
-
-    .scan-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.25rem 2rem;
-      border-bottom: 1px solid var(--border-glass);
-      transition: all 0.2s ease;
-    }
-
-    .scan-item:last-child {
-      border-bottom: none;
-    }
-
-    .scan-item:hover {
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .scan-info {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .scan-pin {
-      font-family: var(--font-mono);
-      font-weight: 600;
-      color: #fff;
-      font-size: 1.1rem;
-    }
-
+    .dashboard-content { padding: 2rem; position: relative; z-index: 1; }
+    .card { background-color: rgba(20, 20, 20, 0.7); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); transition: all 0.3s ease; }
+    
+    /* Scans Page Specific */
+    .scans-list-card { padding: 0; overflow: hidden; }
+    #no-scans-message { padding: 3rem; text-align: center; color: var(--text-secondary); }
+    .scan-item { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); transition: background-color 0.2s ease; }
+    .scan-item:last-child { border-bottom: none; }
+    .scan-item:hover { background-color: rgba(88, 101, 242, 0.05); }
+    .scan-info { display: flex; flex-direction: column; gap: 0.25rem; }
+    .scan-pin { font-weight: 600; font-size: 1rem; }
     .scan-game {
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--accent-color);
-      background: rgba(88, 101, 242, 0.1);
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-      text-transform: uppercase;
-      width: fit-content;
-      margin-top: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--discord-blurple);
+        background-color: rgba(88, 101, 242, 0.1);
+        padding: 0.1rem 0.5rem;
+        border-radius: 4px;
+        text-transform: uppercase;
+        width: fit-content;
     }
-
-    .scan-url {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 0.85rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: color 0.2s;
-    }
-
-    .scan-url:hover {
-      color: var(--accent-color);
-    }
-
-    .scan-time {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      margin-top: 0.25rem;
-    }
-
-    .status-badge {
-      padding: 0.35rem 0.85rem;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .status-badge.pending {
-      background: rgba(245, 158, 11, 0.1);
-      color: var(--warning);
-      border: 1px solid rgba(245, 158, 11, 0.2);
-    }
-
-    .status-badge.success {
-      background: rgba(16, 185, 129, 0.1);
-      color: var(--success);
-      border: 1px solid rgba(16, 185, 129, 0.2);
-    }
-
-    .status-badge.error {
-      background: rgba(239, 68, 68, 0.1);
-      color: var(--danger);
-      border: 1px solid rgba(239, 68, 68, 0.2);
-    }
-
-    .status-scanning {
-      color: var(--accent-color);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+    .scan-url { color: var(--discord-blurple); text-decoration: none; font-size: 0.9rem; cursor: pointer; }
+    .scan-url:hover { text-decoration: underline; }
+    .scan-time { font-size: 0.8rem; color: var(--text-secondary); }
+    .scan-status { font-weight: 500; display: flex; align-items: center; }
+    .scan-actions .scan-action-text { color: var(--text-secondary); font-size: 0.9rem; font-style: italic; }
+    .scan-results-link { 
+      color: var(--discord-blurple); 
+      text-decoration: none; 
+      font-size: 0.9rem; 
       font-weight: 500;
+      transition: color 0.2s ease;
     }
-
-    .loader {
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(88, 101, 242, 0.3);
-      border-top-color: var(--accent-color);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
+    .scan-results-link:hover { 
+      color: #4752C4; 
+      text-decoration: underline; 
     }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .scan-actions {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .scan-results-link {
-      color: var(--accent-color);
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 0.9rem;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      background: rgba(88, 101, 242, 0.1);
-      transition: all 0.2s;
-    }
-
-    .scan-results-link:hover {
-      background: rgba(88, 101, 242, 0.2);
-    }
-
-    .delete-scan-btn {
-      background: transparent;
-      border: 1px solid var(--border-glass);
-      color: var(--text-secondary);
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .delete-scan-btn:hover {
-      border-color: var(--danger);
-      color: var(--danger);
-      background: rgba(239, 68, 68, 0.1);
+    .status-badge { padding: 0.25rem 0.6rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500; }
+    .status-badge.pending { background-color: var(--accent-warning); color: #000; }
+    .status-badge.success { background-color: var(--accent-positive); color: #000; }
+    .status-badge.error { background-color: var(--accent-negative); color: var(--text-primary); }
+    .status-scanning { display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); font-size: 0.9rem; }
+    .loader { width: 16px; height: 16px; border: 2px solid var(--text-secondary); border-top-color: var(--text-primary); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      #app-container { flex-direction: column; position: relative; height: auto; }
+      .sidebar { width: 100%; height: auto; flex-direction: row; align-items: center; padding: 1rem; border-right: none; border-bottom: 1px solid var(--border-color); }
+      .sidebar > div { display: flex; align-items: center; gap: 1rem; }
+      .sidebar .logo { margin-bottom: 0; }
+      .nav-links { flex-direction: row; gap: 0.25rem; flex-grow: 0; }
+      .nav-link { padding: 0.5rem; }
+      .nav-link.active { box-shadow: inset 0 -2px 0 0 var(--discord-blurple); }
+      .nav-link svg { display: block; } .nav-link span { display: none; }
+      #logout-btn { margin-top: 0; }
+      .dashboard-header { padding: 1rem; }
+      .dashboard-header h1 { font-size: 1.25rem; }
+      .primary-btn { padding: 0.5rem 1rem; font-size: 0.8rem; }
+      .scan-item { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+      .scan-actions { width: 100%; }
     }
 
     /* Download Notification */
     .download-notification {
       position: fixed;
-      top: 2rem;
-      right: 2rem;
-      background: rgba(15, 15, 15, 0.95);
+      top: 20px;
+      right: 20px;
+      background: rgba(20, 20, 20, 0.95);
       backdrop-filter: blur(12px);
-      border: 1px solid var(--border-glass);
-      border-radius: 16px;
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
       padding: 1.5rem;
-      width: 400px;
+      max-width: 400px;
       z-index: 1000;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-      animation: slideIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-
-    @keyframes slideIn {
-      from {
-        transform: translateX(100%);
-        opacity: 0;
-      }
-
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
+      animation: slideInRight 0.3s ease-out;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     }
 
     .notification-header {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.75rem;
       margin-bottom: 1rem;
     }
 
+    .notification-icon {
+      font-size: 1.5rem;
+    }
+
     .notification-header h3 {
+      flex-grow: 1;
       font-size: 1.1rem;
       font-weight: 600;
-      color: #fff;
-      flex-grow: 1;
+      color: var(--text-primary);
     }
 
     .close-notification {
       background: none;
       border: none;
       color: var(--text-secondary);
-      cursor: pointer;
       font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0.25rem;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .close-notification:hover {
+      background-color: var(--surface-color);
+      color: var(--text-primary);
     }
 
     .notification-content p {
       color: var(--text-secondary);
       margin-bottom: 1.5rem;
       line-height: 1.5;
-      font-size: 0.9rem;
-    }
-
-    .notification-content strong {
-      color: #fff;
-      font-family: var(--font-mono);
-      background: rgba(255, 255, 255, 0.1);
-      padding: 0.2rem 0.4rem;
-      border-radius: 4px;
     }
 
     .notification-actions {
       display: flex;
       gap: 0.75rem;
+      flex-wrap: wrap;
     }
 
-    .download-btn {
-      flex: 1;
-      background: var(--accent-color);
-      color: #fff;
-      text-decoration: none;
-      padding: 0.75rem;
-      border-radius: 8px;
-      font-weight: 600;
+    .download-btn, .copy-url-btn {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500;
       font-size: 0.9rem;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+    }
+
+    .download-btn {
+      background-color: var(--discord-blurple);
+      color: var(--text-primary);
+      flex-grow: 1;
     }
 
     .download-btn:hover {
-      background: var(--accent-hover);
+      background-color: #4752C4;
+      transform: translateY(-1px);
     }
 
     .copy-url-btn {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-glass);
+      background-color: var(--surface-color);
       color: var(--text-secondary);
-      padding: 0.75rem;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
+      border: 1px solid var(--border-color);
     }
 
     .copy-url-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
+      background-color: var(--border-color);
+      color: var(--text-primary);
     }
 
-    .hidden {
-      display: none !important;
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      #app-container {
-        flex-direction: column;
-        height: auto;
-        overflow: auto;
-      }
+    /* Download Scanner Button */
+    .download-scanner-btn,
+    .delete-scan-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background-color: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      margin-left: 0.5rem;
+      cursor: pointer;
+    }
 
-      .sidebar {
-        width: 100%;
-        height: auto;
-        padding: 1rem;
-        flex-direction: row;
-        align-items: center;
-        position: sticky;
-        top: 0;
-      }
+    .download-scanner-btn:hover {
+      background-color: var(--discord-blurple);
+      border-color: var(--discord-blurple);
+      transform: translateY(-1px);
+    }
 
-      .nav-links {
-        flex-direction: row;
-        overflow-x: auto;
-      }
+    .delete-scan-btn:hover {
+      background-color: var(--accent-negative);
+      border-color: var(--accent-negative);
+      transform: translateY(-1px);
+    }
 
-      .dashboard-content {
-        padding: 1.5rem;
-      }
+    .delete-scan-btn svg {
+      color: var(--text-secondary);
+      transition: color 0.2s ease;
+    }
 
-      .dashboard-header {
-        padding: 1.5rem;
-        flex-direction: column;
-        gap: 1rem;
-        align-items: flex-start;
-      }
+    .delete-scan-btn:hover svg {
+      color: var(--text-primary);
+    }
 
-      .scan-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-      }
+    .scan-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
 
-      .scan-actions {
-        width: 100%;
-        justify-content: space-between;
+    /* SVG Icon Styling */
+    .download-scanner-btn svg,
+    .download-btn svg,
+    .copy-url-btn svg,
+    .notification-icon svg,
+    .scan-url svg {
+      transition: all 0.2s ease;
+    }
+
+    .download-scanner-btn:hover svg,
+    .download-btn:hover svg,
+    .copy-url-btn:hover svg {
+      transform: translateY(-1px);
+    }
+
+    .notification-icon svg {
+      color: var(--discord-blurple);
+    }
+
+    .scan-url svg {
+      opacity: 0.7;
+    }
+
+    .scan-url:hover svg {
+      opacity: 1;
+      color: var(--discord-blurple);
+    }
+
+    /* Notification Styles */
+    .notification {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
       }
     }
   </style>
 </head>
-
 <body>
   <div id="app-container">
     <nav class="sidebar">
@@ -588,91 +356,37 @@
         </div>
         <ul class="nav-links">
           <li><a href="/dashboard.html" class="nav-link" data-page="dashboard">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="7" height="7"></rect>
-                <rect x="14" y="3" width="7" height="7"></rect>
-                <rect x="14" y="14" width="7" height="7"></rect>
-                <rect x="3" y="14" width="7" height="7"></rect>
-              </svg>
-              <span>Dashboard</span>
-            </a></li>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            <span>Dashboard</span>
+          </a></li>
           <li><a href="/scans.html" class="nav-link active" data-page="scans">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <circle cx="12" cy="12" r="6"></circle>
-                <circle cx="12" cy="12" r="2"></circle>
-              </svg>
-              <span>Scans</span>
-            </a></li>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+            <span>Scans</span>
+          </a></li>
           <li><a href="/results.html" class="nav-link" data-page="results">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-                <polyline points="10 9 9 9 8 9"></polyline>
-              </svg>
-              <span>Results</span>
-            </a></li>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            <span>Results</span>
+          </a></li>
           <li><a href="/settings.html" class="nav-link" data-page="settings">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="4" y1="21" x2="4" y2="14"></line>
-                <line x1="4" y1="10" x2="4" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="12"></line>
-                <line x1="12" y1="8" x2="12" y2="3"></line>
-                <line x1="20" y1="21" x2="20" y2="16"></line>
-                <line x1="20" y1="12" x2="20" y2="3"></line>
-                <line x1="1" y1="14" x2="7" y2="14"></line>
-                <line x1="9" y1="8" x2="15" y2="8"></line>
-                <line x1="17" y1="16" x2="23" y2="16"></line>
-              </svg>
-              <span>Settings</span>
-            </a></li>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+            <span>Settings</span>
+          </a></li>
           <li><a href="/rules.html" class="nav-link" data-page="rules">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="8" y1="6" x2="21" y2="6"></line>
-                <line x1="8" y1="12" x2="21" y2="12"></line>
-                <line x1="8" y1="18" x2="21" y2="18"></line>
-                <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                <line x1="3" y1="18" x2="3.01" y2="18"></line>
-              </svg>
-              <span>Rules</span>
-            </a></li>
-          <li id="enterprise-nav-link-container" class="hidden"><a href="/enterprise.html" class="nav-link"
-              data-page="enterprise">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                <circle cx="8.5" cy="7" r="4" />
-                <path d="M20 8v6" />
-                <path d="M23 11h-6" />
-              </svg>
-              <span>Enterprise</span>
-            </a></li>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+            <span>Rules</span>
+          </a></li>
+          <li id="enterprise-nav-link-container" class="hidden"><a href="/enterprise.html" class="nav-link" data-page="enterprise">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6"/><path d="M23 11h-6"/></svg>
+            <span>Enterprise</span>
+          </a></li>
           <li id="admin-nav-link-container" class="hidden"><a href="/admin.html" class="nav-link" data-page="admin">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                <path d="M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
-                <path d="M12 15c-2.2 0-4 1.8-4 4v1h8v-1c0-2.2-1.8-4-4-4z"></path>
-              </svg>
-              <span>Admin</span>
-            </a></li>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path><path d="M12 15c-2.2 0-4 1.8-4 4v1h8v-1c0-2.2-1.8-4-4-4z"></path></svg>
+            <span>Admin</span>
+          </a></li>
         </ul>
       </div>
       <a href="/logout" id="logout-btn" class="nav-link">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-          <polyline points="16 17 21 12 16 7" />
-          <line x1="21" x2="9" y1="12" y2="12" />
-        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
         <span>Logout</span>
       </a>
     </nav>
@@ -680,16 +394,16 @@
       <header class="dashboard-header">
         <h1 id="dashboard-title">My Scans</h1>
         <div id="header-actions">
-          <!-- JS will populate this -->
+            <!-- JS will populate this -->
         </div>
       </header>
       <section class="dashboard-content">
-        <div class="card scans-list-card">
-          <div id="scans-list">
-            <!-- Scan items will be dynamically inserted here -->
+          <div class="card scans-list-card">
+              <div id="scans-list">
+                  <!-- Scan items will be dynamically inserted here -->
+              </div>
+              <p id="no-scans-message" style="display: none;">No scans found. Generate a PIN to begin.</p>
           </div>
-          <p id="no-scans-message" style="display: none;">No scans found. Generate a PIN to begin.</p>
-        </div>
       </section>
     </main>
   </div>
@@ -700,117 +414,118 @@
     const noScansMessage = document.getElementById('no-scans-message');
 
     function formatDate(isoString) {
-      if (!isoString) return 'N/A';
-      try {
-        const date = new Date(isoString);
-        return date.toLocaleString('sv-SE');
-      } catch (e) {
-        return isoString;
-      }
-    }
-
-    function applyCachedAuth() {
-      try {
-        const cachedUser = sessionStorage.getItem('currentUser');
-        if (cachedUser) {
-          const user = JSON.parse(cachedUser);
-          if (user.role === 'admin') {
-            document.getElementById('admin-nav-link-container').classList.remove('hidden');
-          }
-          if (user.is_enterprise_admin) {
-            document.getElementById('enterprise-nav-link-container').classList.remove('hidden');
-          }
+        if (!isoString) return 'N/A';
+        try {
+            const date = new Date(isoString);
+            // Using sv-SE locale provides a YYYY-MM-DD HH:mm:ss format consistently.
+            return date.toLocaleString('sv-SE');
+        } catch (e) {
+            return isoString;
         }
-      } catch (e) {
-        console.warn('Could not apply cached auth state.', e);
-        sessionStorage.removeItem('currentUser');
-      }
+    }
+    
+    function applyCachedAuth() {
+        try {
+            const cachedUser = sessionStorage.getItem('currentUser');
+            if (cachedUser) {
+                const user = JSON.parse(cachedUser);
+                if (user.role === 'admin') {
+                    document.getElementById('admin-nav-link-container').classList.remove('hidden');
+                }
+                if (user.is_enterprise_admin) {
+                    document.getElementById('enterprise-nav-link-container').classList.remove('hidden');
+                }
+            }
+        } catch (e) {
+            console.warn('Could not apply cached auth state.', e);
+            sessionStorage.removeItem('currentUser');
+        }
     }
 
     async function checkAuth() {
-      try {
-        const response = await fetch('/api/user');
-        if (!response.ok) {
-          window.location.href = '/index.html';
-          return null;
+        try {
+            const response = await fetch('/api/user');
+            if (!response.ok) {
+                window.location.href = '/index.html';
+                return null;
+            }
+            const userData = await response.json();
+            sessionStorage.setItem('currentUser', JSON.stringify(userData));
+            if (userData.is_banned || !userData.has_license) {
+                window.location.href = '/unlicensed.html';
+                return null;
+            }
+            currentUser = userData;
+            return userData;
+        } catch (error) {
+            console.error("Auth check failed:", error);
+            window.location.href = '/index.html';
+            return null;
         }
-        const userData = await response.json();
-        sessionStorage.setItem('currentUser', JSON.stringify(userData));
-        if (userData.is_banned || !userData.has_license) {
-          window.location.href = '/unlicensed.html';
-          return null;
-        }
-        currentUser = userData;
-        return userData;
-      } catch (error) {
-        console.error("Auth check failed:", error);
-        window.location.href = '/index.html';
-        return null;
-      }
     }
 
     function setupSharedLayout(user) {
-      if (user && user.role === 'admin') {
-        document.getElementById('admin-nav-link-container').classList.remove('hidden');
-      }
-      if (user && user.is_enterprise_admin) {
-        document.getElementById('enterprise-nav-link-container').classList.remove('hidden');
-      }
-      document.getElementById('logout-btn').addEventListener('click', e => {
-        e.preventDefault();
-        window.location.href = '/logout';
-      });
+        if (user && user.role === 'admin') {
+            document.getElementById('admin-nav-link-container').classList.remove('hidden');
+        }
+        if (user && user.is_enterprise_admin) {
+            document.getElementById('enterprise-nav-link-container').classList.remove('hidden');
+        }
+        document.getElementById('logout-btn').addEventListener('click', e => {
+            e.preventDefault();
+            window.location.href = '/logout';
+        });
     }
 
     function renderScans() {
-      if (!scansList || !noScansMessage) return;
+        if (!scansList || !noScansMessage) return;
 
-      const scansToShow = allScans;
+        const scansToShow = allScans;
 
-      if (scansToShow.length === 0) {
-        noScansMessage.style.display = 'block';
-        scansList.innerHTML = '';
-      } else {
-        noScansMessage.style.display = 'none';
-        scansList.innerHTML = scansToShow.map(scan => {
-          let statusHTML = '';
-          let actionHTML = '';
+        if (scansToShow.length === 0) {
+            noScansMessage.style.display = 'block';
+            scansList.innerHTML = '';
+        } else {
+            noScansMessage.style.display = 'none';
+            scansList.innerHTML = scansToShow.map(scan => {
+                let statusHTML = '';
+                let actionHTML = '';
 
-          switch (scan.status) {
-            case 'Pending':
-              statusHTML = `<span class="status-badge pending">Pending Submission</span>`;
-              actionHTML = `<span class="scan-action-text">Waiting for scanner...</span>`;
-              break;
-            case 'Scanning':
-              statusHTML = `<div class="status-scanning"><div class="loader"></div>Scanning...</div>`;
-              actionHTML = `<span class="scan-action-text">Scan in progress...</span>`;
-              break;
-            case 'Cheats Detected':
-              statusHTML = `<span class="status-badge error">Threats Found</span>`;
-              if (scan.critical_count > 0) {
-                actionHTML = `<a href="/report?id=${scan.id}" class="scan-results-link">View ${scan.critical_count} Critical threat${scan.critical_count !== 1 ? 's' : ''}</a>`;
-              } else {
-                actionHTML = `<a href="/report?id=${scan.id}" class="scan-results-link">View Report</a>`;
-              }
-              break;
-            case 'No threats found':
-              statusHTML = `<span class="status-badge success">Clean</span>`;
-              actionHTML = `<a href="/report?id=${scan.id}" class="scan-results-link">View scan report</a>`;
-              break;
-            default:
-              statusHTML = `<span class="status-badge">${scan.status}</span>`;
-              actionHTML = `<span class="scan-action-text">Status: ${scan.status}</span>`;
-              break;
-          }
-
-          let deleteButton = '';
-          if (currentUser && currentUser.role === 'admin') {
-            deleteButton = `<button class="delete-scan-btn" data-scan-id="${scan.id}" title="Delete PIN">
+                switch (scan.status) {
+                    case 'Pending':
+                        statusHTML = `<span class="status-badge pending">Pending Submission</span>`;
+                        actionHTML = `<span class="scan-action-text">Waiting for scanner...</span>`;
+                        break;
+                    case 'Scanning':
+                        statusHTML = `<div class="status-scanning"><div class="loader"></div>Scanning...</div>`;
+                        actionHTML = `<span class="scan-action-text">Scan in progress...</span>`;
+                        break;
+                    case 'Cheats Detected':
+                        statusHTML = `<span class="status-badge error">Threats Found</span>`;
+                        if (scan.critical_count > 0) {
+                            actionHTML = `<a href="/report?id=${scan.id}" class="scan-results-link">View ${scan.critical_count} Critical threat${scan.critical_count !== 1 ? 's' : ''}</a>`;
+                        } else {
+                            actionHTML = `<a href="/report?id=${scan.id}" class="scan-results-link">View Report</a>`;
+                        }
+                        break;
+                    case 'No threats found':
+                        statusHTML = `<span class="status-badge success">Clean</span>`;
+                        actionHTML = `<a href="/report?id=${scan.id}" class="scan-results-link">View scan report</a>`;
+                        break;
+                    default:
+                        statusHTML = `<span class="status-badge">${scan.status}</span>`;
+                        actionHTML = `<span class="scan-action-text">Status: ${scan.status}</span>`;
+                        break;
+                }
+                
+                let deleteButton = '';
+                if (currentUser && currentUser.role === 'admin') {
+                    deleteButton = `<button class="delete-scan-btn" data-scan-id="${scan.id}" title="Delete PIN">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6m4-6v6"/></svg>
                     </button>`;
-          }
+                }
 
-          return `
+                return `
                     <div class="scan-item" id="scan-item-${scan.id}">
                         <div class="scan-info">
                             <span class="scan-pin">PIN: ${scan.pin}</span>
@@ -830,63 +545,66 @@
                         </div>
                     </div>
                 `;
-        }).join('');
-      }
+            }).join('');
+        }
     }
 
     async function fetchScans(userId = null) {
-      try {
-        const apiUrl = userId ? `/api/scans?user_id=${userId}` : '/api/scans';
-        const response = await fetch(apiUrl);
-        if (!response.ok) {
-          if (response.status === 404 && userId) {
-            throw new Error('User not found.');
-          }
-          throw new Error('Failed to fetch scans from server.');
+        try {
+            const apiUrl = userId ? `/api/scans?user_id=${userId}` : '/api/scans';
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                if(response.status === 404 && userId) {
+                     throw new Error('User not found.');
+                }
+                throw new Error('Failed to fetch scans from server.');
+            }
+            allScans = await response.json();
+            renderScans();
+        } catch (error) {
+            console.error(error);
+            scansList.innerHTML = `<p style="color: var(--accent-negative); padding: 1rem;">Error loading scans: ${error.message}</p>`;
         }
-        allScans = await response.json();
-        renderScans();
-      } catch (error) {
-        console.error(error);
-        scansList.innerHTML = `<p style="color: var(--accent-negative); padding: 1rem;">Error loading scans: ${error.message}</p>`;
-      }
     }
-
+    
     async function generatePin() {
-      const headerActionBtn = document.getElementById('header-action-btn');
-      headerActionBtn.disabled = true;
-      headerActionBtn.textContent = 'Generating...';
-      try {
-        const selectedGame = document.getElementById('game-select').value;
-        const response = await fetch('/api/scans', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ game: selectedGame })
-        });
-        if (!response.ok) throw new Error('Failed to generate new PIN.');
-        const newScan = await response.json();
-        showDownloadNotification(newScan.pin);
-        await fetchScans(); // This will re-render the list with the new PIN
-      } catch (error) {
-        console.error(error);
-        alert('Could not generate a new PIN. Please try again.');
-      } finally {
-        headerActionBtn.disabled = false;
-        headerActionBtn.textContent = 'Generate New PIN';
-      }
+        const headerActionBtn = document.getElementById('header-action-btn');
+        headerActionBtn.disabled = true;
+        headerActionBtn.textContent = 'Generating...';
+        try {
+            const selectedGame = document.getElementById('game-select').value;
+            const response = await fetch('/api/scans', { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ game: selectedGame })
+            });
+            if (!response.ok) throw new Error('Failed to generate new PIN.');
+            const newScan = await response.json();
+            showDownloadNotification(newScan.pin);
+            await fetchScans(); // This will re-render the list with the new PIN
+        } catch (error) {
+            console.error(error);
+            showNotification('Could not generate a new PIN. Please try again.', 'info');
+        } finally {
+            headerActionBtn.disabled = false;
+            headerActionBtn.textContent = 'Generate New PIN';
+        }
     }
 
     function showDownloadNotification(pin) {
-      const existingNotification = document.querySelector('.download-notification');
-      if (existingNotification) existingNotification.remove();
+        const existingNotification = document.querySelector('.download-notification');
+        if (existingNotification) existingNotification.remove();
 
-      const downloadUrl = `${window.location.origin}/api/download-scanner/${pin}`;
-      const notification = document.createElement('div');
-      notification.className = 'download-notification';
-      notification.innerHTML = `
+        const downloadUrl = `${window.location.origin}/api/download-scanner/${pin}`;
+        const notification = document.createElement('div');
+        notification.className = 'download-notification';
+        notification.innerHTML = `
             <div class="notification-header">
+                <span class="notification-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                </span>
                 <h3>Scanner PIN Generated!</h3>
                 <button class="close-notification">&times;</button>
             </div>
@@ -898,76 +616,70 @@
                       Download Scanner
                     </a>
                     <button class="copy-url-btn" data-url="${downloadUrl}">
-                        Copy Link
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy Download Link
                     </button>
                 </div>
             </div>
         `;
-      document.body.appendChild(notification);
-
-      // Event listeners for the new notification
-      notification.querySelector('.close-notification').addEventListener('click', () => notification.remove());
-      notification.querySelector('.copy-url-btn').addEventListener('click', function () {
-        copyToClipboard(this.dataset.url, this);
-      });
-
-      setTimeout(() => { if (notification.parentNode) notification.remove() }, 20000);
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 20000);
     }
 
     function copyToClipboard(text, btn) {
-      navigator.clipboard.writeText(text).then(() => {
-        const originalText = btn.innerHTML;
-        btn.innerHTML = 'Copied!';
-        setTimeout(() => { btn.innerHTML = originalText; }, 2000);
-      }).catch(err => console.error('Failed to copy: ', err));
+        navigator.clipboard.writeText(text).then(() => {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: var(--accent-positive);"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Copied!</span></span>';
+            setTimeout(() => { btn.innerHTML = originalText; }, 2000);
+        }).catch(err => console.error('Failed to copy: ', err));
     }
 
     async function deleteScan(scanId) {
-      const scan = allScans.find(s => s.id === scanId);
-      let confirmMessage = `Are you sure you want to delete PIN ${scan ? scan.pin : ''}? This action cannot be undone.`;
-      if (scan && scan.status !== 'Pending') {
-        confirmMessage = `This scan has results. Are you sure you want to delete PIN ${scan.pin} and its report? This cannot be undone.`
-      }
-
-      if (!confirm(confirmMessage)) return;
-
-      try {
-        const response = await fetch(`/api/scans/${scanId}`, { method: 'DELETE' });
-        if (!response.ok) throw new Error('Failed to delete scan.');
-
-        const scanItemEl = document.getElementById(`scan-item-${scanId}`);
-        if (scanItemEl) scanItemEl.remove();
-
-        allScans = allScans.filter(s => s.id !== scanId);
-        if (allScans.length === 0) {
-          noScansMessage.style.display = 'block';
+        const scan = allScans.find(s => s.id === scanId);
+        let confirmMessage = `Are you sure you want to delete PIN ${scan ? scan.pin : ''}? This action cannot be undone.`;
+        if (scan && scan.status !== 'Pending') {
+            confirmMessage = `This scan has results. Are you sure you want to delete PIN ${scan.pin} and its report? This cannot be undone.`
         }
 
-      } catch (error) {
-        console.error('Error deleting scan:', error);
-        alert(`Failed to delete PIN: ${error.message}`);
-      }
+        if (!confirm(confirmMessage)) return;
+
+        try {
+            const response = await fetch(`/api/scans/${scanId}`, { method: 'DELETE' });
+            if (!response.ok) throw new Error('Failed to delete scan.');
+            
+            const scanItemEl = document.getElementById(`scan-item-${scanId}`);
+            if(scanItemEl) scanItemEl.remove();
+
+            allScans = allScans.filter(s => s.id !== scanId);
+            if (allScans.length === 0) {
+                 noScansMessage.style.display = 'block';
+            }
+
+        } catch (error) {
+            console.error('Error deleting scan:', error);
+            showNotification(`Failed to delete PIN: ${error.message}`);
+        }
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
-      applyCachedAuth();
-      const user = await checkAuth();
-      if (user) {
-        setupSharedLayout(user);
-        const params = new URLSearchParams(window.location.search);
-        const viewUserId = params.get('user_id');
-        const headerActions = document.getElementById('header-actions');
+        applyCachedAuth();
+        const user = await checkAuth();
+        if (user) {
+            setupSharedLayout(user);
+            const params = new URLSearchParams(window.location.search);
+            const viewUserId = params.get('user_id');
+            const headerActions = document.getElementById('header-actions');
 
-        if (viewUserId && user.role === 'admin') {
-          document.getElementById('dashboard-title').textContent = `Scans for User: ${viewUserId}`;
-          headerActions.innerHTML = `
+            if (viewUserId && user.role === 'admin') {
+                document.getElementById('dashboard-title').textContent = `Scans for User: ${viewUserId}`;
+                headerActions.innerHTML = `
                     <button id="refresh-btn" class="secondary-btn">Refresh</button>
                     <a href="/admin.html" class="secondary-btn" style="text-decoration: none;">Back to Admin</a>
                 `;
-          document.getElementById('refresh-btn').addEventListener('click', () => fetchScans(viewUserId));
-          fetchScans(viewUserId);
-        } else {
-          headerActions.innerHTML = `
+                document.getElementById('refresh-btn').addEventListener('click', () => fetchScans(viewUserId));
+                fetchScans(viewUserId);
+            } else {
+                 headerActions.innerHTML = `
                     <select id="game-select" class="game-select-dropdown">
                         <option value="fivem">For FiveM</option>
                         <option value="dayz" disabled>For DayZ (Soon)</option>
@@ -977,26 +689,37 @@
                     <button id="refresh-btn" class="secondary-btn">Refresh</button>
                 `;
 
-          const savedGame = localStorage.getItem('selectedGame');
-          const gameSelect = document.getElementById('game-select');
-          if (savedGame && gameSelect) {
-            if (gameSelect.querySelector(`option[value="${savedGame}"]:not([disabled])`)) {
-              gameSelect.value = savedGame;
+                const savedGame = localStorage.getItem('selectedGame');
+                const gameSelect = document.getElementById('game-select');
+                if (savedGame && gameSelect) {
+                    if (gameSelect.querySelector(`option[value="${savedGame}"]:not([disabled])`)) {
+                        gameSelect.value = savedGame;
+                    }
+                }
+                
+                fetchScans();
+                document.getElementById('header-action-btn').addEventListener('click', generatePin);
+                document.getElementById('refresh-btn').addEventListener('click', () => fetchScans());
             }
-          }
 
-          fetchScans();
-          document.getElementById('header-action-btn').addEventListener('click', generatePin);
-          document.getElementById('refresh-btn').addEventListener('click', () => fetchScans());
+            document.body.addEventListener('click', (e) => {
+                const closeBtn = e.target.closest('.close-notification');
+                if (closeBtn) closeBtn.parentElement.parentElement.remove();
+                
+                const copyUrlBtn = e.target.closest('.copy-url-btn');
+                if(copyUrlBtn) copyToClipboard(copyUrlBtn.dataset.url, copyUrlBtn);
+                
+                const deleteBtn = e.target.closest('.delete-scan-btn');
+                if(deleteBtn) deleteScan(parseInt(deleteBtn.dataset.scanId, 10));
+
+                const urlLink = e.target.closest('.scan-url');
+                if(urlLink) {
+                     e.preventDefault();
+                     copyToClipboard(urlLink.dataset.url, urlLink);
+                }
+            });
         }
-
-        document.body.addEventListener('click', (e) => {
-          const deleteBtn = e.target.closest('.delete-scan-btn');
-          if (deleteBtn) deleteScan(parseInt(deleteBtn.dataset.scanId, 10));
-        });
-      }
     });
   </script>
 </body>
-
 </html>
